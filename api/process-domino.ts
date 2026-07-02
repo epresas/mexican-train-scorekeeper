@@ -11,10 +11,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { image } = req.body;
+    const { image, imag } = req.body;
+    const imageData = image || imag;
 
     // 2. Control de excepciones de la petición entrante
-    if (!image) {
+    if (!imageData) {
       return res
         .status(400)
         .json({ error: "No se recibió ninguna imagen para procesar." });
@@ -53,7 +54,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         {
           inlineData: {
             mimeType: "image/jpeg",
-            data: image, // String Base64 puro enviado desde tu useDominoScanner
+            data: imageData, // String Base64 puro enviado desde tu useDominoScanner
           },
         },
       ],

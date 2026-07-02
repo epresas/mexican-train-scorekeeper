@@ -1,0 +1,190 @@
+import { Check, LogOut, Timer, Flag, CheckCircle2 } from "lucide-react"
+import { AnimatePresence, motion } from "motion/react"
+import { Button } from "../../components/Button"
+import { ExitConfirmModal } from "./ExitConfirmModal"
+import { useGameBoard } from "./useGameBoard"
+
+const cellContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.05 } },
+}
+const cellChild = {
+  hidden: { opacity: 0, scale: 0.85 },
+  show: { opacity: 1, scale: 1 },
+}
+
+export const GameBoard = () => {
+  const vm = useGameBoard()
+
+  return (
+    <main className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-6 sm:px-6">
+      {/* Header */}
+      <header className="mb-6 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted">
+            {vm.t("common.round")}
+          </p>
+          <p className="font-mono text-2xl font-black text-text-primary">
+            {vm.currentRound}
+            <span className="text-muted">/{vm.totalRounds}</span>
+          </p>
+        </div>
+
+        <motion.div
+          className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2"
+          animate={{ scale: [1, 1.04, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+        >
+          <Timer size={18} className="text-primary" />
+          <span className="font-mono text-lg font-black text-text-primary">
+            {vm.timerLabel}
+          </span>
+        </motion.div>
+
+        <Button variant="ghost" size="sm" onClick={vm.requestExit}>
+          <LogOut size={16} />
+          <span className="sr-only sm:not-sr-only">{vm.t("game.exit")}</span>
+        </Button>
+      </header>
+
+      {/* Score table */}
+      <div className="overflow-x-auto rounded-xl border border-border bg-surface">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr className="border-b border-border">
+              <th className="px-3 py-3 text-left text-xs uppercase tracking-wide text-muted">
+                {vm.t("common.round")}
+              </th>
+              {vm.players.map((p) => (
+                <th key={p.id} className="px-3 py-3 text-center">
+                  <span className="flex items-center justify-center gap-1.5">
+                    <span
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: p.color }}
+                      aria-hidden="true"
+                    />
+                    <span className="font-bold text-text-primary">
+                      {p.name}
+                    </span>
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {vm.rounds.map((r) => (
+              <motion.tr
+                key={r.index}
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="border-b border-border/60"
+              >
+                <td className="px-3 py-2 font-mono text-muted">{r.index}</td>
+                {vm.players.map((p) => (
+                  <td
+                    key={p.id}
+                    className="px-3 py-2 text-center font-mono font-black text-text-primary"
+                  >
+                    {r.scores[p.id] ?? 0}
+                  </td>
+                ))}
+              </motion.tr>
+            ))}
+
+            {/* Active input row */}
+            <AnimatePresence>
+              {vm.isInputPhase && (
+                <motion.tr
+                  variants={cellContainer}
+                  initial="hidden"
+                  animate="show"
+                  className="bg-bg/40"
+                >
+                  <td className="px-3 py-3 align-top">
+                    <span className="inline-flex items-center gap-1 font-mono text-xs font-black text-primary">
+                      <Flag size={12} />
+                      {vm.currentRound}
+                    </span>
+                  </td>
+                  {vm.players.map((p) => (
+                    <td key={p.id} className="px-2 py-3 align-top">
+                      <motion.div
+                        variants={cellChild}
+                        className="flex flex-col items-center gap-2"
+                      >
+                        <input
+                          inputMode="numeric"
+                          value={p.entry.value}
+                          disabled={p.entry.arrived}
+                          onChange={(e) => vm.setScore(p.id, e.target.value)}
+                          placeholder="0"
+                          className="w-16 rounded-lg border border-border bg-surface px-2 py-2 text-center font-mono text-base font-black text-text-primary placeholder:text-muted focus:border-primary focus:outline-none disabled:opacity-60"
+                        />
+                        <button
+                          onClick={() => vm.toggleArrived(p.id)}
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors ${
+                            p.entry.arrived
+                              ? "bg-success text-bg"
+                              : "border border-border text-muted hover:text-text-primary"
+                          }`}
+                        >
+                          <CheckCircle2 size={12} />
+                          {vm.t("game.arrived")}
+                        </button>
+                      </motion.div>
+                    </td>
+                  ))}
+                </motion.tr>
+              )}
+            </AnimatePresence>
+          </tbody>
+
+          <tfoot>
+            <tr className="border-t-2 border-border">
+              <td className="px-3 py-3 text-xs uppercase tracking-wide text-muted">
+                {vm.t("game.runningTotal")}
+              </td>
+              {vm.players.map((p) => (
+                <td
+                  key={p.id}
+                  className="px-3 py-3 text-center font-mono text-lg font-black"
+                  style={{ color: p.color }}
+                >
+                  {p.total}
+                </td>
+              ))}
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      {vm.error && (
+        <p role="alert" className="mt-4 text-sm font-bold text-danger">
+          {vm.error}
+        </p>
+      )}
+
+      {/* Footer actions */}
+      <div className="mt-6 flex justify-center">
+        {vm.isInputPhase ? (
+          <Button size="lg" onClick={vm.submitRound}>
+            <Check size={18} />
+            {vm.t("game.confirmScores")}
+          </Button>
+        ) : (
+          <Button size="lg" variant="primary" onClick={vm.endRound}>
+            <Flag size={18} />
+            {vm.t("game.endRound")}
+          </Button>
+        )}
+      </div>
+
+      <ExitConfirmModal
+        open={vm.exitOpen}
+        onStay={vm.cancelExit}
+        onConfirm={vm.confirmExit}
+      />
+    </main>
+  )
+}

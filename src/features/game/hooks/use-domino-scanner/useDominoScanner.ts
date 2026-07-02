@@ -19,7 +19,8 @@ export function useDominoScanner({
 
         // .split(',') rompe el texto en: [0] "data:image/jpeg;base64" y [1] "cadenabase64..."
         // Usamos el operador de encadenamiento opcional y un fallback por seguridad de tipos
-        const base64String = result.split(",")[1] ?? "";
+        const parts = result.split(",");
+        const base64String = parts[1] || parts[0];
 
         if (!base64String) {
           reject(

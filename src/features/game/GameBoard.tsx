@@ -1,20 +1,26 @@
-import { Check, LogOut, Timer, Flag, CheckCircle2 } from "lucide-react"
-import { AnimatePresence, motion } from "motion/react"
-import { Button } from "../../components/Button"
-import { ExitConfirmModal } from "./ExitConfirmModal"
-import { useGameBoard } from "./useGameBoard"
+import { Check, LogOut, Timer, Flag, CheckCircle2 } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import { useState } from "react"; // Añadido para capturar errores locales del escáner
+import { Button } from "../../components/Button";
+import { ExitConfirmModal } from "./components/exit-confirm-modal/ExitConfirmModal";
+import { DominoScanner } from "./components/domino-scanner/DominoScanner";
+import { useGameBoard } from "./hooks/use-game-board/useGameBoard";
+import { useCameraCheck } from "../../hooks/useCameraCheck/useCameraCheck";
 
 const cellContainer = {
   hidden: {},
   show: { transition: { staggerChildren: 0.05 } },
-}
+};
 const cellChild = {
   hidden: { opacity: 0, scale: 0.85 },
   show: { opacity: 1, scale: 1 },
-}
+};
 
 export const GameBoard = () => {
-  const vm = useGameBoard()
+  const vm = useGameBoard();
+  const { hasCamera, isLoading } = useCameraCheck();
+  // Estado local para notificar si falla la petición de IA en algún jugador específico
+  const [scannerError, setScannerError] = useState<string | null>(null);
 
   return (
     <main className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-6 sm:px-6">
@@ -113,14 +119,32 @@ export const GameBoard = () => {
                         variants={cellChild}
                         className="flex flex-col items-center gap-2"
                       >
-                        <input
-                          inputMode="numeric"
-                          value={p.entry.value}
-                          disabled={p.entry.arrived}
-                          onChange={(e) => vm.setScore(p.id, e.target.value)}
-                          placeholder="0"
-                          className="w-16 rounded-lg border border-border bg-surface px-2 py-2 text-center font-mono text-base font-black text-text-primary placeholder:text-muted focus:border-primary focus:outline-none disabled:opacity-60"
-                        />
+                        {/* Contenedor horizontal para alinear Input + Cámara */}
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            inputMode="numeric"
+                            value={p.entry.value}
+                            disabled={p.entry.arrived}
+                            onChange={(e) => vm.setScore(p.id, e.target.value)}
+                            placeholder="0"
+                            className="w-16 rounded-lg border border-border bg-surface px-2 py-2 text-center font-mono text-base font-black text-text-primary placeholder:text-muted focus:border-primary focus:outline-none disabled:opacity-60"
+                          />
+
+                          {/* Inyección de escáner inteligente */}
+                          {!isLoading && hasCamera && !p.entry.arrived && (
+                            <DominoScanner
+                              onPointsDetected={(points) => {
+                                setScannerError(null);
+                                // Seteamos el puntaje convirtiendo el número a string para tu VM
+                                vm.setScore(p.id, String(points));
+                              }}
+                              onError={(msg) =>
+                                setScannerError(`${p.name}: ${msg}`)
+                              }
+                            />
+                          )}
+                        </div>
+
                         <button
                           onClick={() => vm.toggleArrived(p.id)}
                           className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors ${
@@ -159,9 +183,13 @@ export const GameBoard = () => {
         </table>
       </div>
 
-      {vm.error && (
-        <p role="alert" className="mt-4 text-sm font-bold text-danger">
-          {vm.error}
+      {/* Renderizado de errores (tanto de validación global como de escáner) */}
+      {(vm.error || scannerError) && (
+        <p
+          role="alert"
+          className="mt-4 text-sm font-bold text-danger text-center"
+        >
+          {vm.error || scannerError}
         </p>
       )}
 
@@ -186,5 +214,5 @@ export const GameBoard = () => {
         onConfirm={vm.confirmExit}
       />
     </main>
-  )
-}
+  );
+};

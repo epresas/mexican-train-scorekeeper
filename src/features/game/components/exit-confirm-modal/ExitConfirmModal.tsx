@@ -1,11 +1,11 @@
-import { Modal } from "../../components/Modal"
-import { Button } from "../../components/Button"
-import { useTranslation } from "../../i18n/useTranslation"
+import { Modal } from "../../../../components/Modal";
+import { Button } from "../../../../components/Button";
+import { useTranslation } from "../../../../i18n/useTranslation";
 
 interface ExitConfirmModalProps {
-  open: boolean
-  onStay: () => void
-  onConfirm: () => void
+  open: boolean;
+  onStay: () => void;
+  onConfirm: () => void;
 }
 
 export const ExitConfirmModal = ({
@@ -13,9 +13,14 @@ export const ExitConfirmModal = ({
   onStay,
   onConfirm,
 }: ExitConfirmModalProps) => {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   return (
-    <Modal open={open} onClose={onStay} title={t("exit.title")} maxWidth="max-w-md">
+    <Modal
+      open={open}
+      onClose={onStay}
+      title={t("exit.title")}
+      maxWidth="max-w-md"
+    >
       <p className="leading-relaxed text-muted text-pretty">{t("exit.body")}</p>
       <div className="mt-6 flex justify-end gap-3">
         <Button variant="secondary" onClick={onStay}>
@@ -26,5 +31,5 @@ export const ExitConfirmModal = ({
         </Button>
       </div>
     </Modal>
-  )
-}
+  );
+};

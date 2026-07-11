@@ -5,7 +5,7 @@ interface UseDominoScannerProps {
   onError: (error: string) => void;
 }
 
-async function compressImage(file: File, maxWidth = 1024, quality = 0.7): Promise<string> {
+async function compressImage(file: File, maxWidth = 1400, quality = 0.85): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {

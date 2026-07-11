@@ -1,8 +1,7 @@
 import { useMemo, useState } from "react";
 import { useGameContext } from "../../../../context/GameContext";
 import { useTranslation } from "../../../../i18n/useTranslation";
-import { useTimer, formatDuration } from "../../../../hooks/useTimer/useTimer";
-import { allTotals } from "../../../../helpers/scoreHelpers";
+import { allTotals, standings } from "../../../../helpers/scoreHelpers";
 import { playerColor } from "../../../../helpers/constants";
 
 interface ScoreEntry {
@@ -16,11 +15,6 @@ export const useGameBoard = () => {
   const { state, dispatch } = useGameContext();
   const { t } = useTranslation();
 
-  const { elapsed } = useTimer({
-    startTime: state.roundStartTime,
-    running: state.phase === "playing",
-  });
-
   const [entries, setEntries] = useState<Record<string, ScoreEntry>>({});
   const [error, setError] = useState<string | null>(null);
   const [exitOpen, setExitOpen] = useState(false);
@@ -30,15 +24,24 @@ export const useGameBoard = () => {
     [state.players, state.rounds],
   );
 
+  const rankInfo = useMemo(
+    () => standings(state.players, state.rounds),
+    [state.players, state.rounds],
+  );
+
+  const hasRounds = state.rounds.length > 0;
+
   const players = useMemo(
     () =>
       state.players.map((p, i) => ({
         ...p,
         color: playerColor(i),
         total: totals[p.id] ?? 0,
+        rank: rankInfo[p.id]?.rank ?? 0,
+        rankDelta: rankInfo[p.id]?.delta ?? 0,
         entry: entries[p.id] ?? emptyEntry(),
       })),
-    [state.players, totals, entries],
+    [state.players, totals, rankInfo, entries],
   );
 
   const endRound = () => {
@@ -88,9 +91,14 @@ export const useGameBoard = () => {
       arrivals[p.id] = entry.arrived;
     }
 
+    // Duration is measured silently from the round start — no live timer UI.
+    const duration = state.roundStartTime
+      ? Math.max(0, Math.floor((Date.now() - state.roundStartTime) / 1000))
+      : 0;
+
     dispatch({
       type: "SUBMIT_ROUND",
-      payload: { scores, arrivals, duration: elapsed },
+      payload: { scores, arrivals, duration },
     });
     setEntries({});
   };
@@ -109,7 +117,7 @@ export const useGameBoard = () => {
     currentRound: state.currentRound,
     totalRounds: state.totalRounds,
     isInputPhase: state.isInputPhase,
-    timerLabel: formatDuration(elapsed),
+    hasRounds,
     error,
     exitOpen,
     endRound,

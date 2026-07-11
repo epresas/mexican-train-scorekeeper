@@ -36,6 +36,33 @@ export const rankPlayers = (
   })
 }
 
+export interface Standing {
+  rank: number
+  /** positions moved vs. before the latest round; +gained, -lost, 0 unchanged */
+  delta: number
+}
+
+/**
+ * Current rank per player plus how many positions they moved compared to the
+ * standings before the most recent round was submitted.
+ */
+export const standings = (
+  players: Player[],
+  rounds: Round[],
+): Record<string, Standing> => {
+  const currentRanks = rankPlayers(players, rounds)
+  const prevRanks = rankPlayers(players, rounds.slice(0, -1))
+  const prevRankById = Object.fromEntries(
+    prevRanks.map((r) => [r.player.id, r.rank]),
+  )
+  return Object.fromEntries(
+    currentRanks.map((r) => {
+      const prev = prevRankById[r.player.id] ?? r.rank
+      return [r.player.id, { rank: r.rank, delta: prev - r.rank }]
+    }),
+  )
+}
+
 /** The winning player (lowest total). Undefined if no players. */
 export const winner = (
   players: Player[],

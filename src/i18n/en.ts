@@ -16,6 +16,7 @@ export const en: Record<TranslationKey, string> = {
   "common.rounds": "Rounds",
   "common.total": "Total",
   "common.points": "Points",
+  "common.rank": "Rank",
 
   // Language toggle
   "lang.label": "Language",
@@ -80,7 +81,7 @@ export const en: Record<TranslationKey, string> = {
   "stats.mostArrivals": "Most arrivals",
   "stats.mostLast": "Most times last",
   "stats.totalTime": "Total time",
-  "stats.longestRound": "Longest round",
+  "stats.highestRound": "Highest single round",
   "stats.none": "—",
 
   // Exit modal

@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true,
-    allowedHosts: ["sb-33qhk2dy340g.vercel.run"],
+    allowedHosts: ["sb-33qhk2dy340g.vercel.run", "sb-33sr3nudrrt6.vercel.run"],
   },
   test: {
     globals: true,
     environment: "jsdom",
     setupFiles: "./src/test/setup.ts",
   },
-});
+})

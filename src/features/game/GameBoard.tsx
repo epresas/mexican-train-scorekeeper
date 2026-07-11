@@ -1,4 +1,12 @@
-import { Check, LogOut, Timer, Flag, CheckCircle2 } from "lucide-react";
+import {
+  Check,
+  LogOut,
+  Flag,
+  CheckCircle2,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react"; // Añadido para capturar errores locales del escáner
 import { Button } from "../../components/Button";
@@ -14,6 +22,29 @@ const cellContainer = {
 const cellChild = {
   hidden: { opacity: 0, scale: 0.85 },
   show: { opacity: 1, scale: 1 },
+};
+
+const MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
+
+/** Up/down/neutral movement vs. the previous round's standings. */
+const RankMovement = ({ delta }: { delta: number }) => {
+  if (delta > 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 font-mono text-xs font-bold text-success">
+        <ArrowUp size={12} aria-hidden="true" />
+        {delta}
+      </span>
+    );
+  }
+  if (delta < 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 font-mono text-xs font-bold text-danger">
+        <ArrowDown size={12} aria-hidden="true" />
+        {Math.abs(delta)}
+      </span>
+    );
+  }
+  return <Minus size={12} className="text-muted" aria-hidden="true" />;
 };
 
 export const GameBoard = () => {
@@ -35,17 +66,6 @@ export const GameBoard = () => {
             <span className="text-muted">/{vm.totalRounds}</span>
           </p>
         </div>
-
-        <motion.div
-          className="flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2"
-          animate={{ scale: [1, 1.04, 1] }}
-          transition={{ duration: 1, repeat: Infinity }}
-        >
-          <Timer size={18} className="text-primary" />
-          <span className="font-mono text-lg font-black text-text-primary">
-            {vm.timerLabel}
-          </span>
-        </motion.div>
 
         <Button variant="ghost" size="sm" onClick={vm.requestExit}>
           <LogOut size={16} />
@@ -169,15 +189,34 @@ export const GameBoard = () => {
               <td className="px-3 py-3 text-xs uppercase tracking-wide text-muted">
                 {vm.t("game.runningTotal")}
               </td>
-              {vm.players.map((p) => (
-                <td
-                  key={p.id}
-                  className="px-3 py-3 text-center font-mono text-lg font-black"
-                  style={{ color: p.color }}
-                >
-                  {p.total}
-                </td>
-              ))}
+              {vm.players.map((p) => {
+                const medal = vm.hasRounds ? MEDALS[p.rank] : undefined;
+                return (
+                  <td key={p.id} className="px-3 py-3 text-center align-top">
+                    <div className="flex flex-col items-center gap-1">
+                      <span
+                        className="font-mono text-lg font-black"
+                        style={{ color: p.color }}
+                      >
+                        {p.total}
+                      </span>
+                      {vm.hasRounds && (
+                        <span className="flex items-center gap-1.5">
+                          {medal && (
+                            <span
+                              className="text-sm leading-none"
+                              aria-label={`${vm.t("common.rank")} ${p.rank}`}
+                            >
+                              {medal}
+                            </span>
+                          )}
+                          <RankMovement delta={p.rankDelta} />
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                );
+              })}
             </tr>
           </tfoot>
         </table>

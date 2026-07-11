@@ -1,4 +1,4 @@
-import { Award, Clock, Hourglass, TrendingDown } from "lucide-react";
+import { Award, Clock, Flame, TrendingDown } from "lucide-react";
 import {
   CartesianGrid,
   Line,
@@ -13,7 +13,7 @@ import { Badge } from "../../components/Badge";
 import { useTranslation } from "../../i18n/useTranslation";
 import { cumulativeSeries } from "../../helpers/scoreHelpers";
 import {
-  longestRound,
+  getHighestSingleRoundScore,
   mostArrivals,
   mostRoundsAsLast,
   totalTime,
@@ -42,6 +42,7 @@ export const StatsPanel = ({
   const data = cumulativeSeries(players, rounds);
   const arrivalsLeader = mostArrivals(players);
   const lastLeader = mostRoundsAsLast(players);
+  const highestRound = getHighestSingleRoundScore(rounds, players);
   const none = t("stats.none");
 
   return (
@@ -120,10 +121,16 @@ export const StatsPanel = ({
           value={formatDuration(totalTime(rounds))}
         />
         <Badge
-          icon={Hourglass}
+          icon={Flame}
           accent="#F59E0B"
-          label={t("stats.longestRound")}
-          value={formatDuration(longestRound(rounds))}
+          label={t("stats.highestRound")}
+          value={
+            highestRound
+              ? `${highestRound.player.name} · ${highestRound.score} (${t(
+                  "common.round",
+                )} ${highestRound.round})`
+              : none
+          }
         />
       </div>
     </Modal>

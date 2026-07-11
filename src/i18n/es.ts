@@ -14,6 +14,7 @@ export const es = {
   "common.rounds": "Rondas",
   "common.total": "Total",
   "common.points": "Puntos",
+  "common.rank": "Posición",
 
   // Language toggle
   "lang.label": "Idioma",
@@ -78,7 +79,7 @@ export const es = {
   "stats.mostArrivals": "Más llegadas",
   "stats.mostLast": "Más veces último",
   "stats.totalTime": "Tiempo total",
-  "stats.longestRound": "Ronda más larga",
+  "stats.highestRound": "Mayor puntaje en una ronda",
   "stats.none": "—",
 
   // Exit modal

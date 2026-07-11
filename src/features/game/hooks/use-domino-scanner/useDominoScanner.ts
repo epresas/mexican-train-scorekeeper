@@ -5,41 +5,44 @@ interface UseDominoScannerProps {
   onError: (error: string) => void;
 }
 
+async function compressImage(file: File, maxWidth = 1024, quality = 0.7): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const scale = Math.min(1, maxWidth / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) {
+          reject(new Error("No se pudo procesar la imagen"));
+          return;
+        }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const base64 = canvas.toDataURL("image/jpeg", quality).split(",")[1];
+        resolve(base64);
+      };
+      img.onerror = () => reject(new Error("No se pudo cargar la imagen"));
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => reject(new Error("No se pudo leer el archivo"));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function useDominoScanner({
   onPointsDetected,
   onError,
 }: UseDominoScannerProps) {
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
-  const fileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const result = reader.result as string;
-
-        // .split(',') rompe el texto en: [0] "data:image/jpeg;base64" y [1] "cadenabase64..."
-        // Usamos el operador de encadenamiento opcional y un fallback por seguridad de tipos
-        const parts = result.split(",");
-        const base64String = parts[1] || parts[0];
-
-        if (!base64String) {
-          reject(
-            new Error("No se pudo extraer la cadena Base64 de la imagen."),
-          );
-          return;
-        }
-
-        resolve(base64String);
-      };
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   const processImage = async (file: File) => {
     setIsProcessing(true);
 
     try {
-      const base64Image = await fileToBase64(file);
+      const base64Image = await compressImage(file);
 
       const response = await fetch("/api/process-domino", {
         method: "POST",

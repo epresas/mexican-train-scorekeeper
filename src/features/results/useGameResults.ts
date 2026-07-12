@@ -39,6 +39,7 @@ export const useGameResults = () => {
     rounds: state.rounds,
     colorById,
     statsOpen,
+    gameRules: state.gameRules,
     openStats,
     closeStats,
     newGame,

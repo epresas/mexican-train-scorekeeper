@@ -4,12 +4,17 @@ import type { Player, Round } from "../types/game.types"
 export const playerTotal = (playerId: string, rounds: Round[]): number =>
   rounds.reduce((sum, r) => sum + (r.scores[playerId] ?? 0), 0)
 
-/** Map of playerId → total points. */
+/** Map of playerId → total points (effective, subtracting arrival bonus). */
 export const allTotals = (
   players: Player[],
   rounds: Round[],
 ): Record<string, number> =>
-  Object.fromEntries(players.map((p) => [p.id, playerTotal(p.id, rounds)]))
+  Object.fromEntries(
+    players.map((p) => [
+      p.id,
+      playerTotal(p.id, rounds) - (p.arrivalBonusTotal ?? 0),
+    ]),
+  )
 
 export interface RankedPlayer {
   player: Player

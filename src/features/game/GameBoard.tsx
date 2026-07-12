@@ -6,6 +6,7 @@ import {
   ArrowUp,
   ArrowDown,
   Minus,
+  AlertTriangle,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react"; // Añadido para capturar errores locales del escáner
@@ -14,6 +15,7 @@ import { ExitConfirmModal } from "./components/exit-confirm-modal/ExitConfirmMod
 import { DominoScanner } from "./components/domino-scanner/DominoScanner";
 import { useGameBoard } from "./hooks/use-game-board/useGameBoard";
 import { useCameraCheck } from "../../hooks/useCameraCheck/useCameraCheck";
+import { PenaltyPopover } from "./components/PenaltyPopover";
 
 const cellContainer = {
   hidden: {},
@@ -82,8 +84,8 @@ export const GameBoard = () => {
                 {vm.t("common.round")}
               </th>
               {vm.players.map((p) => (
-                <th key={p.id} className="px-3 py-3 text-center">
-                  <span className="flex items-center justify-center gap-1.5">
+                <th key={p.id} className="relative px-3 py-3 text-center">
+                  <div className="flex items-center justify-center gap-1.5">
                     <span
                       className="h-2.5 w-2.5 rounded-full"
                       style={{ backgroundColor: p.color }}
@@ -92,7 +94,52 @@ export const GameBoard = () => {
                     <span className="font-bold text-text-primary">
                       {p.name}
                     </span>
-                  </span>
+                    {vm.gameRules.penaltiesEnabled && (
+                      <div className="relative">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (vm.activePopoverPlayerId === p.id) {
+                              vm.closePenaltyPopover()
+                            } else {
+                              vm.openPenaltyPopover(p.id)
+                            }
+                          }}
+                          className={`relative flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-border/50 ${
+                            p.pendingPenalties > 0 ? "text-danger" : "text-muted hover:text-text-primary"
+                          }`}
+                          aria-label={`Add penalty to ${p.name}`}
+                        >
+                          <AlertTriangle size={14} />
+                          <AnimatePresence>
+                            {p.pendingPenalties > 0 && (
+                              <motion.span
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                exit={{ scale: 0 }}
+                                className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-danger font-mono text-[9px] font-bold text-white"
+                              >
+                                {p.pendingPenalties}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </button>
+                        <AnimatePresence>
+                          {vm.activePopoverPlayerId === p.id && (
+                            <PenaltyPopover
+                              playerName={p.name}
+                              playerId={p.id}
+                              value={vm.penaltyAmount}
+                              onChange={vm.setPenaltyAmount}
+                              onConfirm={() => vm.confirmPenalty(p.id)}
+                              onClose={vm.closePenaltyPopover}
+                              t={vm.t}
+                            />
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>

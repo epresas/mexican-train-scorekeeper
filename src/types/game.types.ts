@@ -1,5 +1,11 @@
 export type GamePhase = "dashboard" | "setup" | "playing" | "results"
 
+export interface GameRules {
+  arrivalBonus: boolean
+  penaltiesEnabled: boolean
+  penaltyMultiplier: 3 | 5
+}
+
 export interface Player {
   id: string
   name: string
@@ -7,6 +13,8 @@ export interface Player {
   arrivals: number
   /** times they had the highest score in a round */
   roundsAsLast: number
+  penaltyCount: number        // cumulative across the game
+  arrivalBonusTotal: number   // cumulative: arrivals * 10
 }
 
 export interface Round {
@@ -29,6 +37,8 @@ export interface GameState {
   roundStartTime: number | null
   isInputPhase: boolean
   pendingScores: Record<string, number | null>
+  gameRules: GameRules
+  currentRoundPenalties: Record<string, number>
 }
 
 export interface SetupPlayerInput {
@@ -52,3 +62,7 @@ export type GameAction =
       }
     }
   | { type: "EXIT_GAME" }
+  | { type: "SET_GAME_RULES"; payload: GameRules }
+  | { type: "ADD_PENALTY"; payload: { playerId: string; amount?: number } }
+  | { type: "RESTORE_GAME"; payload: GameState }
+

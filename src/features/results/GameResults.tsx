@@ -78,6 +78,11 @@ export const GameResults = () => {
                   style={{ color: r.color }}
                 >
                   {r.total}
+                  {vm.gameRules.arrivalBonus && r.player.arrivalBonusTotal > 0 && (
+                    <span className="text-sm font-normal text-muted ml-1">
+                      (-{r.player.arrivalBonusTotal})
+                    </span>
+                  )}
                 </p>
                 <p className="text-xs uppercase tracking-wide text-muted">
                   {vm.t("results.points")}

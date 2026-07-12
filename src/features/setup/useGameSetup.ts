@@ -25,6 +25,11 @@ export const useGameSetup = () => {
   )
   const [error, setError] = useState<string | null>(null)
 
+  // Additional rules state
+  const [arrivalBonus, setArrivalBonus] = useState(false)
+  const [penaltiesEnabled, setPenaltiesEnabled] = useState(false)
+  const [penaltyMultiplier, setPenaltyMultiplier] = useState<3 | 5>(3)
+
   const changeCount = (count: number) => {
     const clamped = Math.min(MAX_PLAYERS, Math.max(MIN_PLAYERS, count))
     setPlayerCount(clamped)
@@ -73,6 +78,16 @@ export const useGameSetup = () => {
       id: makeId(),
       name,
     }))
+    
+    dispatch({
+      type: "SET_GAME_RULES",
+      payload: {
+        arrivalBonus,
+        penaltiesEnabled,
+        penaltyMultiplier,
+      },
+    })
+
     dispatch({
       type: "START_GAME",
       payload: { players: payload, totalRounds },
@@ -91,10 +106,17 @@ export const useGameSetup = () => {
     maxPlayers: MAX_PLAYERS,
     minRounds: MIN_ROUNDS,
     maxRounds: MAX_ROUNDS,
+    arrivalBonus,
+    toggleArrivalBonus: () => setArrivalBonus((v) => !v),
+    penaltiesEnabled,
+    togglePenaltiesEnabled: () => setPenaltiesEnabled((v) => !v),
+    penaltyMultiplier,
+    setPenaltyMultiplier,
     changeCount,
     changeName,
     changeRounds,
     startGame,
     exit,
   }
+
 }

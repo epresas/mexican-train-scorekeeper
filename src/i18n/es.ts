@@ -15,6 +15,8 @@ export const es = {
   "common.total": "Total",
   "common.points": "Puntos",
   "common.rank": "Posición",
+  "common.gameRestored": "Partida recuperada",
+  "common.storageWarning": "No se pudo guardar la partida en este dispositivo",
 
   // Language toggle
   "lang.label": "Idioma",
@@ -50,6 +52,10 @@ export const es = {
   "setup.roundCount": "Número de rondas",
   "setup.playerNames": "Nombres de los jugadores",
   "setup.playerPlaceholder": "Jugador {n}",
+  "setup.additionalRules": "Reglas adicionales",
+  "setup.arrivalBonus": "Restar 10 puntos al llegar",
+  "setup.enablePenalties": "Activar penalizaciones",
+  "setup.penaltyMultiplier": "Multiplicador",
   "setup.startGame": "Iniciar partida",
   "setup.errorNames": "Todos los jugadores necesitan un nombre.",
   "setup.errorDuplicate": "Los nombres no pueden repetirse.",
@@ -64,6 +70,7 @@ export const es = {
   "game.runningTotal": "Total acumulado",
   "game.roundTimer": "Tiempo de ronda",
   "game.errorScores": "Ingresa un puntaje válido para cada jugador.",
+  "game.addPenaltyTo": "Añadir penalización a {name}",
 
   // Results
   "results.title": "Resultados finales",

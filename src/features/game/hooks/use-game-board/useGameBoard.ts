@@ -35,11 +35,14 @@ export const useGameBoard = () => {
       state.players.map((p, i) => {
         const rawTotal = playerTotal(p.id, state.rounds);
         const arrivalBonusTotal = p.arrivalBonusTotal ?? 0;
-        let totalDisplay = String(rawTotal);
+        const effective = rawTotal - arrivalBonusTotal;
+        const isNegative = state.gameRules.arrivalBonus && effective < 0;
 
-        if (state.gameRules.arrivalBonus && arrivalBonusTotal > 0) {
-          totalDisplay = `${rawTotal} (-${arrivalBonusTotal})`;
-        }
+        // Clamp display to 0 — negative effective is a ranking advantage but
+        // should never render as a number below zero.
+        const totalDisplay = isNegative
+          ? `0 (-${arrivalBonusTotal})`
+          : String(effective);
 
         return {
           ...p,

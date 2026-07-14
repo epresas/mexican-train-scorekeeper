@@ -77,8 +77,8 @@ export const GameResults = () => {
                   className="font-mono text-2xl font-black"
                   style={{ color: r.color }}
                 >
-                  {r.total}
-                  {vm.gameRules.arrivalBonus && r.player.arrivalBonusTotal > 0 && (
+                  {Math.max(0, r.total)}
+                  {vm.gameRules.arrivalBonus && r.total < 0 && (
                     <span className="text-sm font-normal text-muted ml-1">
                       (-{r.player.arrivalBonusTotal})
                     </span>

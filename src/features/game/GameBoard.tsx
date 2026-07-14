@@ -9,7 +9,7 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react"; // Añadido para capturar errores locales del escáner
+import { useRef, useState } from "react";
 import { Button } from "../../components/Button";
 import { ExitConfirmModal } from "./components/exit-confirm-modal/ExitConfirmModal";
 import { DominoScanner } from "./components/domino-scanner/DominoScanner";
@@ -52,8 +52,15 @@ const RankMovement = ({ delta }: { delta: number }) => {
 export const GameBoard = () => {
   const vm = useGameBoard();
   const { hasCamera, isLoading } = useCameraCheck();
-  // Estado local para notificar si falla la petición de IA en algún jugador específico
   const [scannerError, setScannerError] = useState<string | null>(null);
+  // One ref per player for the penalty trigger button — stable map keyed by id
+  const penaltyBtnRefs = useRef<Record<string, React.RefObject<HTMLButtonElement | null>>>({});
+  const getPenaltyRef = (id: string) => {
+    if (!penaltyBtnRefs.current[id]) {
+      penaltyBtnRefs.current[id] = { current: null };
+    }
+    return penaltyBtnRefs.current[id];
+  };
 
   return (
     <main className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-6 sm:px-6">
@@ -97,6 +104,7 @@ export const GameBoard = () => {
                     {vm.gameRules.penaltiesEnabled && (
                       <div className="relative">
                         <button
+                          ref={getPenaltyRef(p.id) as React.RefObject<HTMLButtonElement>}
                           type="button"
                           onClick={() => {
                             if (vm.activePopoverPlayerId === p.id) {
@@ -124,19 +132,18 @@ export const GameBoard = () => {
                             )}
                           </AnimatePresence>
                         </button>
-                        <AnimatePresence>
-                          {vm.activePopoverPlayerId === p.id && (
-                            <PenaltyPopover
-                              playerName={p.name}
-                              playerId={p.id}
-                              value={vm.penaltyAmount}
-                              onChange={vm.setPenaltyAmount}
-                              onConfirm={() => vm.confirmPenalty(p.id)}
-                              onClose={vm.closePenaltyPopover}
-                              t={vm.t}
-                            />
-                          )}
-                        </AnimatePresence>
+                        {vm.activePopoverPlayerId === p.id && (
+                          <PenaltyPopover
+                            playerName={p.name}
+                            playerId={p.id}
+                            triggerRef={getPenaltyRef(p.id)}
+                            value={vm.penaltyAmount}
+                            onChange={vm.setPenaltyAmount}
+                            onConfirm={() => vm.confirmPenalty(p.id)}
+                            onClose={vm.closePenaltyPopover}
+                            t={vm.t}
+                          />
+                        )}
                       </div>
                     )}
                   </div>

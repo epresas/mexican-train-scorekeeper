@@ -44,6 +44,12 @@ export const es = {
   "help.step5.title": "Gana el que menos suma",
   "help.step5.body":
     "Cuando se completan todas las rondas, el jugador con el menor puntaje total gana la partida. ¡Que empiece el tren!",
+  "help.step6.title": "Bono de llegada",
+  "help.step6.body":
+    "Si activas '​Restar 10 puntos al llegar', cada vez que un jugador llegue se restan 10 puntos de su total acumulado. El total puede volverse negativo, y en ese caso verás el descuento entre paréntesis, como -5 (-10).",
+  "help.step7.title": "Penalizaciones",
+  "help.step7.body":
+    "Si activas las penalizaciones, aparece el icono ⚠️ junto a cada jugador. Tócalo para añadir penalizaciones durante la ronda. Al confirmar los puntos, cada penalización se multiplica por ×3 o ×5 según la configuración y se suma al marcador del jugador.",
   "help.progress": "Paso {current} de {total}",
 
   // Setup

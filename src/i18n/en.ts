@@ -46,6 +46,12 @@ export const en: Record<TranslationKey, string> = {
   "help.step5.title": "Lowest score wins",
   "help.step5.body":
     "Once all rounds are complete, the player with the lowest total wins the game. All aboard!",
+  "help.step6.title": "Arrival bonus",
+  "help.step6.body":
+    "If you enable 'Subtract 10 points on arrival', each time a player goes out 10 points are deducted from their running total. The total can turn negative — when it does, you'll see the deduction in parentheses, e.g. -5 (-10).",
+  "help.step7.title": "Penalties",
+  "help.step7.body":
+    "If you enable penalties, a ⚠️ icon appears next to each player's name. Tap it to add penalties during a round. When you confirm scores, each penalty count is multiplied by ×3 or ×5 (as configured) and added to that player's score.",
   "help.progress": "Step {current} of {total}",
 
   // Setup

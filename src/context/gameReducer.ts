@@ -85,7 +85,9 @@ export const gameReducer = (
         pendingScores: Object.fromEntries(
           state.players.map((p) => [p.id, null]),
         ),
-        currentRoundPenalties: {},
+        // NOTE: do NOT reset currentRoundPenalties here — penalties are added
+        // via ADD_PENALTY during the input phase (after END_ROUND), so they
+        // must survive until SUBMIT_ROUND consumes and clears them.
       }
 
     case "SUBMIT_ROUND": {

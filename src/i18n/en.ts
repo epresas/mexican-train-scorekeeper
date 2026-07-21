@@ -17,6 +17,8 @@ export const en: Record<TranslationKey, string> = {
   "common.total": "Total",
   "common.points": "Points",
   "common.rank": "Rank",
+  "common.gameRestored": "Game restored",
+  "common.storageWarning": "Could not save game on this device",
 
   // Language toggle
   "lang.label": "Language",
@@ -44,6 +46,15 @@ export const en: Record<TranslationKey, string> = {
   "help.step5.title": "Lowest score wins",
   "help.step5.body":
     "Once all rounds are complete, the player with the lowest total wins the game. All aboard!",
+  "help.step6.title": "Arrival bonus",
+  "help.step6.body":
+    "If you enable 'Subtract 10 points on arrival', each time a player goes out 10 points are deducted from their running total. The total can turn negative — when it does, you'll see the deduction in parentheses, e.g. -5 (-10).",
+  "help.step7.title": "Penalties",
+  "help.step7.body":
+    "If you enable penalties, a ⚠️ icon appears next to each player's name. Tap it to add penalties during a round. When you confirm scores, each penalty count is multiplied by ×3 or ×5 (as configured) and added to that player's score.",
+  "help.step8.title": "Arrivals mode",
+  "help.step8.body":
+    "If you enable 'Arrivals mode' in setup, instead of adding up tile points for each player, you simply select who went out in each round. The winner will be the player with the most arrivals at the end.",
   "help.progress": "Step {current} of {total}",
 
   // Setup
@@ -52,6 +63,11 @@ export const en: Record<TranslationKey, string> = {
   "setup.roundCount": "Number of rounds",
   "setup.playerNames": "Player names",
   "setup.playerPlaceholder": "Player {n}",
+  "setup.additionalRules": "Additional rules",
+  "setup.arrivalsOnlyMode": "Arrivals mode",
+  "setup.arrivalBonus": "Subtract 10 points on arrival",
+  "setup.enablePenalties": "Enable penalties",
+  "setup.penaltyMultiplier": "Multiplier",
   "setup.startGame": "Start game",
   "setup.errorNames": "Every player needs a name.",
   "setup.errorDuplicate": "Names cannot be repeated.",
@@ -66,6 +82,7 @@ export const en: Record<TranslationKey, string> = {
   "game.runningTotal": "Running total",
   "game.roundTimer": "Round timer",
   "game.errorScores": "Enter a valid score for each player.",
+  "game.addPenaltyTo": "Add penalty to {name}",
 
   // Results
   "results.title": "Final results",

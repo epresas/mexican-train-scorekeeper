@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useGameContext } from "../../../../context/GameContext";
 import { useTranslation } from "../../../../i18n/useTranslation";
-import { allTotals, standings } from "../../../../helpers/scoreHelpers";
+import { playerTotal, standings } from "../../../../helpers/scoreHelpers";
 import { playerColor } from "../../../../helpers/constants";
 
 interface ScoreEntry {
@@ -19,29 +19,36 @@ export const useGameBoard = () => {
   const [error, setError] = useState<string | null>(null);
   const [exitOpen, setExitOpen] = useState(false);
 
-  const totals = useMemo(
-    () => allTotals(state.players, state.rounds),
-    [state.players, state.rounds],
-  );
+  // Penalty Popover state
+  const [activePopoverPlayerId, setActivePopoverPlayerId] = useState<string | null>(null);
+  const [penaltyAmount, setPenaltyAmount] = useState<number>(1);
+
+  const isArrivalsOnly = state.gameRules.mode === "arrivalsOnly";
 
   const rankInfo = useMemo(
-    () => standings(state.players, state.rounds),
-    [state.players, state.rounds],
+    () => standings(state.players, state.rounds, state.gameRules.mode),
+    [state.players, state.rounds, state.gameRules.mode],
   );
 
   const hasRounds = state.rounds.length > 0;
 
   const players = useMemo(
     () =>
-      state.players.map((p, i) => ({
-        ...p,
-        color: playerColor(i),
-        total: totals[p.id] ?? 0,
-        rank: rankInfo[p.id]?.rank ?? 0,
-        rankDelta: rankInfo[p.id]?.delta ?? 0,
-        entry: entries[p.id] ?? emptyEntry(),
-      })),
-    [state.players, totals, rankInfo, entries],
+      state.players.map((p, i) => {
+        const rawTotal = playerTotal(p.id, state.rounds);
+        const totalDisplay = isArrivalsOnly ? String(p.arrivals) : String(rawTotal);
+
+        return {
+          ...p,
+          color: playerColor(i),
+          total: totalDisplay,
+          rank: rankInfo[p.id]?.rank ?? 0,
+          rankDelta: rankInfo[p.id]?.delta ?? 0,
+          entry: entries[p.id] ?? emptyEntry(),
+          pendingPenalties: state.currentRoundPenalties[p.id] ?? 0,
+        };
+      }),
+    [state.players, state.rounds, entries, state.gameRules, state.currentRoundPenalties, rankInfo, isArrivalsOnly],
   );
 
   const endRound = () => {
@@ -66,6 +73,19 @@ export const useGameBoard = () => {
     setEntries((prev) => {
       const current = prev[playerId] ?? emptyEntry();
       const arrived = !current.arrived;
+
+      if (isArrivalsOnly) {
+        // In arrivals-only mode, selecting a player clears arrived flag for others
+        const newEntries: Record<string, ScoreEntry> = {};
+        for (const p of state.players) {
+          newEntries[p.id] = {
+            arrived: p.id === playerId ? arrived : false,
+            value: p.id === playerId && arrived ? "1" : "0",
+          };
+        }
+        return newEntries;
+      }
+
       return {
         ...prev,
         [playerId]: {
@@ -81,14 +101,26 @@ export const useGameBoard = () => {
     const scores: Record<string, number> = {};
     const arrivals: Record<string, boolean> = {};
 
+    let hasArrival = false;
     for (const p of state.players) {
       const entry = entries[p.id] ?? emptyEntry();
-      if (entry.value === "" || Number.isNaN(Number(entry.value))) {
-        setError(t("game.errorScores"));
-        return;
+      if (entry.arrived) hasArrival = true;
+
+      if (!isArrivalsOnly) {
+        if (entry.value === "" || Number.isNaN(Number(entry.value))) {
+          setError(t("game.errorScores"));
+          return;
+        }
+        scores[p.id] = Number(entry.value);
+      } else {
+        scores[p.id] = entry.arrived ? 1 : 0;
       }
-      scores[p.id] = Number(entry.value);
       arrivals[p.id] = entry.arrived;
+    }
+
+    if (isArrivalsOnly && !hasArrival) {
+      setError(t("game.errorScores"));
+      return;
     }
 
     // Duration is measured silently from the round start — no live timer UI.
@@ -110,6 +142,23 @@ export const useGameBoard = () => {
     dispatch({ type: "EXIT_GAME" });
   };
 
+  const openPenaltyPopover = (playerId: string) => {
+    setActivePopoverPlayerId(playerId);
+    setPenaltyAmount(1);
+  };
+
+  const closePenaltyPopover = () => {
+    setActivePopoverPlayerId(null);
+  };
+
+  const confirmPenalty = (playerId: string) => {
+    dispatch({
+      type: "ADD_PENALTY",
+      payload: { playerId, amount: penaltyAmount },
+    });
+    closePenaltyPopover();
+  };
+
   return {
     t,
     players,
@@ -120,6 +169,9 @@ export const useGameBoard = () => {
     hasRounds,
     error,
     exitOpen,
+    gameRules: state.gameRules,
+    activePopoverPlayerId,
+    penaltyAmount,
     endRound,
     setScore,
     toggleArrived,
@@ -127,5 +179,10 @@ export const useGameBoard = () => {
     requestExit,
     cancelExit,
     confirmExit,
+    openPenaltyPopover,
+    closePenaltyPopover,
+    setPenaltyAmount,
+    confirmPenalty,
   };
 };
+

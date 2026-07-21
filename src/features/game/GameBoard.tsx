@@ -6,14 +6,17 @@ import {
   ArrowUp,
   ArrowDown,
   Minus,
+  AlertTriangle,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useState } from "react"; // Añadido para capturar errores locales del escáner
+import { useRef, useState } from "react";
 import { Button } from "../../components/Button";
 import { ExitConfirmModal } from "./components/exit-confirm-modal/ExitConfirmModal";
 import { DominoScanner } from "./components/domino-scanner/DominoScanner";
 import { useGameBoard } from "./hooks/use-game-board/useGameBoard";
 import { useCameraCheck } from "../../hooks/useCameraCheck/useCameraCheck";
+import { PenaltyPopover } from "./components/PenaltyPopover";
+import { isFeatureEnabled } from "../../config/featureFlags";
 
 const cellContainer = {
   hidden: {},
@@ -50,8 +53,18 @@ const RankMovement = ({ delta }: { delta: number }) => {
 export const GameBoard = () => {
   const vm = useGameBoard();
   const { hasCamera, isLoading } = useCameraCheck();
-  // Estado local para notificar si falla la petición de IA en algún jugador específico
   const [scannerError, setScannerError] = useState<string | null>(null);
+  const showScanner = isFeatureEnabled("dominoScanner");
+  const isArrivalsOnly = vm.gameRules.mode === "arrivalsOnly";
+
+  // One ref per player for the penalty trigger button — stable map keyed by id
+  const penaltyBtnRefs = useRef<Record<string, React.RefObject<HTMLButtonElement | null>>>({});
+  const getPenaltyRef = (id: string) => {
+    if (!penaltyBtnRefs.current[id]) {
+      penaltyBtnRefs.current[id] = { current: null };
+    }
+    return penaltyBtnRefs.current[id];
+  };
 
   return (
     <main className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-6 sm:px-6">
@@ -82,8 +95,8 @@ export const GameBoard = () => {
                 {vm.t("common.round")}
               </th>
               {vm.players.map((p) => (
-                <th key={p.id} className="px-3 py-3 text-center">
-                  <span className="flex items-center justify-center gap-1.5">
+                <th key={p.id} className="relative px-3 py-3 text-center">
+                  <div className="flex items-center justify-center gap-1.5">
                     <span
                       className="h-2.5 w-2.5 rounded-full"
                       style={{ backgroundColor: p.color }}
@@ -92,7 +105,52 @@ export const GameBoard = () => {
                     <span className="font-bold text-text-primary">
                       {p.name}
                     </span>
-                  </span>
+                    {vm.gameRules.penaltiesEnabled && (
+                      <div className="relative">
+                        <button
+                          ref={getPenaltyRef(p.id) as React.RefObject<HTMLButtonElement>}
+                          type="button"
+                          onClick={() => {
+                            if (vm.activePopoverPlayerId === p.id) {
+                              vm.closePenaltyPopover()
+                            } else {
+                              vm.openPenaltyPopover(p.id)
+                            }
+                          }}
+                          className={`relative flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-border/50 ${
+                            p.pendingPenalties > 0 ? "text-danger" : "text-muted hover:text-text-primary"
+                          }`}
+                          aria-label={`Add penalty to ${p.name}`}
+                        >
+                          <AlertTriangle size={14} />
+                          <AnimatePresence>
+                            {p.pendingPenalties > 0 && (
+                              <motion.span
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                exit={{ scale: 0 }}
+                                className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-danger font-mono text-[9px] font-bold text-white"
+                              >
+                                {p.pendingPenalties}
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
+                        </button>
+                        {vm.activePopoverPlayerId === p.id && (
+                          <PenaltyPopover
+                            playerName={p.name}
+                            playerId={p.id}
+                            triggerRef={getPenaltyRef(p.id)}
+                            value={vm.penaltyAmount}
+                            onChange={vm.setPenaltyAmount}
+                            onConfirm={() => vm.confirmPenalty(p.id)}
+                            onClose={vm.closePenaltyPopover}
+                            t={vm.t}
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </th>
               ))}
             </tr>
@@ -134,48 +192,63 @@ export const GameBoard = () => {
                     </span>
                   </td>
                   {vm.players.map((p) => (
-                    <td key={p.id} className="px-2 py-3 align-top">
+                    <td key={p.id} className="px-2 py-3 align-top text-center">
                       <motion.div
                         variants={cellChild}
                         className="flex flex-col items-center gap-2"
                       >
-                        {/* Contenedor horizontal para alinear Input + Cámara */}
-                        <div className="flex items-center gap-1.5">
-                          <input
-                            inputMode="numeric"
-                            value={p.entry.value}
-                            disabled={p.entry.arrived}
-                            onChange={(e) => vm.setScore(p.id, e.target.value)}
-                            placeholder="0"
-                            className="w-16 rounded-lg border border-border bg-surface px-2 py-2 text-center font-mono text-base font-black text-text-primary placeholder:text-muted focus:border-primary focus:outline-none disabled:opacity-60"
-                          />
+                        {isArrivalsOnly ? (
+                          <button
+                            onClick={() => vm.toggleArrived(p.id)}
+                            className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold uppercase tracking-wide transition-colors ${
+                              p.entry.arrived
+                                ? "bg-success text-bg shadow-sm"
+                                : "border border-border text-muted hover:text-text-primary hover:border-primary"
+                            }`}
+                          >
+                            <CheckCircle2 size={16} />
+                            {vm.t("game.arrived")}
+                          </button>
+                        ) : (
+                          <>
+                            {/* Contenedor horizontal para alinear Input + Cámara */}
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                inputMode="numeric"
+                                value={p.entry.value}
+                                disabled={p.entry.arrived}
+                                onChange={(e) => vm.setScore(p.id, e.target.value)}
+                                placeholder="0"
+                                className="w-16 rounded-lg border border-border bg-surface px-2 py-2 text-center font-mono text-base font-black text-text-primary placeholder:text-muted focus:border-primary focus:outline-none disabled:opacity-60"
+                              />
 
-                          {/* Inyección de escáner inteligente */}
-                          {!isLoading && hasCamera && !p.entry.arrived && (
-                            <DominoScanner
-                              onPointsDetected={(points) => {
-                                setScannerError(null);
-                                // Seteamos el puntaje convirtiendo el número a string para tu VM
-                                vm.setScore(p.id, String(points));
-                              }}
-                              onError={(msg) =>
-                                setScannerError(`${p.name}: ${msg}`)
-                              }
-                            />
-                          )}
-                        </div>
+                              {/* Inyección de escáner inteligente (Detrás de Feature Flag) */}
+                              {showScanner && !isLoading && hasCamera && !p.entry.arrived && (
+                                <DominoScanner
+                                  onPointsDetected={(points) => {
+                                    setScannerError(null);
+                                    vm.setScore(p.id, String(points));
+                                  }}
+                                  onError={(msg) =>
+                                    setScannerError(`${p.name}: ${msg}`)
+                                  }
+                                />
+                              )}
+                            </div>
 
-                        <button
-                          onClick={() => vm.toggleArrived(p.id)}
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors ${
-                            p.entry.arrived
-                              ? "bg-success text-bg"
-                              : "border border-border text-muted hover:text-text-primary"
-                          }`}
-                        >
-                          <CheckCircle2 size={12} />
-                          {vm.t("game.arrived")}
-                        </button>
+                            <button
+                              onClick={() => vm.toggleArrived(p.id)}
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors ${
+                                p.entry.arrived
+                                  ? "bg-success text-bg"
+                                  : "border border-border text-muted hover:text-text-primary"
+                              }`}
+                            >
+                              <CheckCircle2 size={12} />
+                              {vm.t("game.arrived")}
+                            </button>
+                          </>
+                        )}
                       </motion.div>
                     </td>
                   ))}

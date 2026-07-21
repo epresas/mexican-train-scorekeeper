@@ -15,6 +15,8 @@ export const es = {
   "common.total": "Total",
   "common.points": "Puntos",
   "common.rank": "Posición",
+  "common.gameRestored": "Partida recuperada",
+  "common.storageWarning": "No se pudo guardar la partida en este dispositivo",
 
   // Language toggle
   "lang.label": "Idioma",
@@ -42,6 +44,15 @@ export const es = {
   "help.step5.title": "Gana el que menos suma",
   "help.step5.body":
     "Cuando se completan todas las rondas, el jugador con el menor puntaje total gana la partida. ¡Que empiece el tren!",
+  "help.step6.title": "Bono de llegada",
+  "help.step6.body":
+    "Si activas '​Restar 10 puntos al llegar', cada vez que un jugador llegue se restan 10 puntos de su total acumulado. El total puede volverse negativo, y en ese caso verás el descuento entre paréntesis, como -5 (-10).",
+  "help.step7.title": "Penalizaciones",
+  "help.step7.body":
+    "Si activas las penalizaciones, aparece el icono ⚠️ junto a cada jugador. Tócalo para añadir penalizaciones durante la ronda. Al confirmar los puntos, cada penalización se multiplica por ×3 o ×5 según la configuración y se suma al marcador del jugador.",
+  "help.step8.title": "Modo llegada",
+  "help.step8.body":
+    "Si activas 'Modo llegada' en la configuración, en lugar de anotar los puntos de las fichas restantes de cada jugador, solo seleccionas quién se quedó sin fichas en la ronda. Al finalizar todas las rondas, el ganador será la persona que más llegadas acumule.",
   "help.progress": "Paso {current} de {total}",
 
   // Setup
@@ -50,6 +61,11 @@ export const es = {
   "setup.roundCount": "Número de rondas",
   "setup.playerNames": "Nombres de los jugadores",
   "setup.playerPlaceholder": "Jugador {n}",
+  "setup.additionalRules": "Reglas adicionales",
+  "setup.arrivalsOnlyMode": "Modo llegada",
+  "setup.arrivalBonus": "Restar 10 puntos al llegar",
+  "setup.enablePenalties": "Activar penalizaciones",
+  "setup.penaltyMultiplier": "Multiplicador",
   "setup.startGame": "Iniciar partida",
   "setup.errorNames": "Todos los jugadores necesitan un nombre.",
   "setup.errorDuplicate": "Los nombres no pueden repetirse.",
@@ -64,6 +80,7 @@ export const es = {
   "game.runningTotal": "Total acumulado",
   "game.roundTimer": "Tiempo de ronda",
   "game.errorScores": "Ingresa un puntaje válido para cada jugador.",
+  "game.addPenaltyTo": "Añadir penalización a {name}",
 
   // Results
   "results.title": "Resultados finales",

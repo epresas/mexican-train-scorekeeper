@@ -20,12 +20,12 @@ export const useGameResults = () => {
 
   const ranked = useMemo(
     () =>
-      rankPlayers(state.players, state.rounds).map((r) => ({
+      rankPlayers(state.players, state.rounds, state.gameRules.mode).map((r) => ({
         ...r,
         color: colorById[r.player.id],
         medal: r.rank <= 3 ? MEDALS[r.rank - 1] : null,
       })),
-    [state.players, state.rounds, colorById],
+    [state.players, state.rounds, state.gameRules.mode, colorById],
   )
 
   const openStats = () => setStatsOpen(true)
@@ -39,6 +39,7 @@ export const useGameResults = () => {
     rounds: state.rounds,
     colorById,
     statsOpen,
+    gameRules: state.gameRules,
     openStats,
     closeStats,
     newGame,

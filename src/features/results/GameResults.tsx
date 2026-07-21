@@ -80,7 +80,7 @@ export const GameResults = () => {
                   {r.total}
                 </p>
                 <p className="text-xs uppercase tracking-wide text-muted">
-                  {vm.t("results.points")}
+                  {vm.gameRules.mode === "arrivalsOnly" ? vm.t("results.arrivals") : vm.t("results.points")}
                 </p>
               </div>
             </motion.li>
@@ -110,6 +110,7 @@ export const GameResults = () => {
         players={vm.players}
         rounds={vm.rounds}
         colorById={vm.colorById}
+        mode={vm.gameRules.mode}
       />
     </main>
   )

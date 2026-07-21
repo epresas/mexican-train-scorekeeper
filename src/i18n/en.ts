@@ -52,6 +52,9 @@ export const en: Record<TranslationKey, string> = {
   "help.step7.title": "Penalties",
   "help.step7.body":
     "If you enable penalties, a ⚠️ icon appears next to each player's name. Tap it to add penalties during a round. When you confirm scores, each penalty count is multiplied by ×3 or ×5 (as configured) and added to that player's score.",
+  "help.step8.title": "Arrivals mode",
+  "help.step8.body":
+    "If you enable 'Arrivals mode' in setup, instead of adding up tile points for each player, you simply select who went out in each round. The winner will be the player with the most arrivals at the end.",
   "help.progress": "Step {current} of {total}",
 
   // Setup
@@ -61,6 +64,7 @@ export const en: Record<TranslationKey, string> = {
   "setup.playerNames": "Player names",
   "setup.playerPlaceholder": "Player {n}",
   "setup.additionalRules": "Additional rules",
+  "setup.arrivalsOnlyMode": "Arrivals mode",
   "setup.arrivalBonus": "Subtract 10 points on arrival",
   "setup.enablePenalties": "Enable penalties",
   "setup.penaltyMultiplier": "Multiplier",

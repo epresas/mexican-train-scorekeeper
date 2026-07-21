@@ -112,87 +112,111 @@ export const GameSetup = () => {
             {vm.t("setup.additionalRules")}
           </p>
           <div className="flex flex-col gap-4 rounded-lg border border-border bg-bg/50 p-4">
-            {/* Arrival Bonus Toggle */}
+            {/* Arrivals Only Mode Toggle */}
             <div className="flex items-center justify-between gap-4">
-              <label htmlFor="arrival-bonus-toggle" className="text-sm font-medium text-text-primary cursor-pointer select-none">
-                {vm.t("setup.arrivalBonus")}
+              <label htmlFor="arrivals-only-toggle" className="text-sm font-medium text-text-primary cursor-pointer select-none">
+                {vm.t("setup.arrivalsOnlyMode")}
               </label>
               <button
-                id="arrival-bonus-toggle"
+                id="arrivals-only-toggle"
                 type="button"
-                onClick={vm.toggleArrivalBonus}
+                onClick={vm.toggleArrivalsOnly}
                 className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  vm.arrivalBonus ? "bg-primary" : "bg-border"
+                  vm.isArrivalsOnly ? "bg-primary" : "bg-border"
                 }`}
               >
                 <span
                   className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${
-                    vm.arrivalBonus ? "translate-x-5" : "translate-x-0"
+                    vm.isArrivalsOnly ? "translate-x-5" : "translate-x-0"
                   }`}
                 />
               </button>
             </div>
 
-            {/* Penalty System Toggle */}
-            <div className="flex items-center justify-between gap-4">
-              <label htmlFor="penalties-toggle" className="text-sm font-medium text-text-primary cursor-pointer select-none">
-                {vm.t("setup.enablePenalties")}
-              </label>
-              <button
-                id="penalties-toggle"
-                type="button"
-                onClick={vm.togglePenaltiesEnabled}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  vm.penaltiesEnabled ? "bg-primary" : "bg-border"
-                }`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${
-                    vm.penaltiesEnabled ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
-
-            {/* Penalty Multiplier Segmented Control */}
+            {/* Standard Mode Rules (Arrival Bonus & Penalties) */}
             <AnimatePresence>
-              {vm.penaltiesEnabled && (
+              {!vm.isArrivalsOnly && (
                 <motion.div
-                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                  animate={{ height: "auto", opacity: 1, marginTop: 4 }}
-                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="overflow-hidden"
+                  className="flex flex-col gap-4 overflow-hidden border-t border-border/40 pt-4"
                 >
-                  <div className="flex items-center justify-between border-t border-border/40 pt-3">
-                    <span className="text-sm text-muted">
-                      {vm.t("setup.penaltyMultiplier")}
-                    </span>
-                    <div className="flex rounded-lg bg-bg p-0.5 border border-border">
-                      <button
-                        type="button"
-                        onClick={() => vm.setPenaltyMultiplier(3)}
-                        className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${
-                          vm.penaltyMultiplier === 3
-                            ? "bg-primary text-bg"
-                            : "text-muted hover:text-text-primary"
+                  {/* Arrival Bonus Toggle */}
+                  <div className="flex items-center justify-between gap-4">
+                    <label htmlFor="arrival-bonus-toggle" className="text-sm font-medium text-text-primary cursor-pointer select-none">
+                      {vm.t("setup.arrivalBonus")}
+                    </label>
+                    <button
+                      id="arrival-bonus-toggle"
+                      type="button"
+                      onClick={vm.toggleArrivalBonus}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        vm.arrivalBonus ? "bg-primary" : "bg-border"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${
+                          vm.arrivalBonus ? "translate-x-5" : "translate-x-0"
                         }`}
-                      >
-                        ×3
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => vm.setPenaltyMultiplier(5)}
-                        className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${
-                          vm.penaltyMultiplier === 5
-                            ? "bg-primary text-bg"
-                            : "text-muted hover:text-text-primary"
-                        }`}
-                      >
-                        ×5
-                      </button>
-                    </div>
+                      />
+                    </button>
                   </div>
+
+                  {/* Penalty System Toggle */}
+                  <div className="flex items-center justify-between gap-4">
+                    <label htmlFor="penalties-toggle" className="text-sm font-medium text-text-primary cursor-pointer select-none">
+                      {vm.t("setup.enablePenalties")}
+                    </label>
+                    <button
+                      id="penalties-toggle"
+                      type="button"
+                      onClick={vm.togglePenaltiesEnabled}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        vm.penaltiesEnabled ? "bg-primary" : "bg-border"
+                      }`}
+                    >
+                      <span
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${
+                          vm.penaltiesEnabled ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Penalty Multiplier Segmented Control */}
+                  {vm.penaltiesEnabled && (
+                    <div className="flex items-center justify-between border-t border-border/40 pt-3">
+                      <span className="text-sm text-muted">
+                        {vm.t("setup.penaltyMultiplier")}
+                      </span>
+                      <div className="flex rounded-lg bg-bg p-0.5 border border-border">
+                        <button
+                          type="button"
+                          onClick={() => vm.setPenaltyMultiplier(3)}
+                          className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${
+                            vm.penaltyMultiplier === 3
+                              ? "bg-primary text-bg"
+                              : "text-muted hover:text-text-primary"
+                          }`}
+                        >
+                          ×3
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => vm.setPenaltyMultiplier(5)}
+                          className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${
+                            vm.penaltyMultiplier === 5
+                              ? "bg-primary text-bg"
+                              : "text-muted hover:text-text-primary"
+                          }`}
+                        >
+                          ×5
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

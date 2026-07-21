@@ -19,7 +19,7 @@ import {
   totalTime,
 } from "../../helpers/statsHelpers";
 import { formatDuration } from "../../hooks/useTimer/useTimer";
-import type { Player, Round } from "../../types/game.types";
+import type { GameMode, Player, Round } from "../../types/game.types";
 
 interface StatsPanelProps {
   open: boolean;
@@ -27,6 +27,7 @@ interface StatsPanelProps {
   players: Player[];
   rounds: Round[];
   colorById: Record<string, string>;
+  mode?: GameMode;
 }
 
 // NOTE: presentational modal — receives all data via props, no context/state logic.
@@ -36,6 +37,7 @@ export const StatsPanel = ({
   players,
   rounds,
   colorById,
+  mode = "standard",
 }: StatsPanelProps) => {
   const { t } = useTranslation();
 
@@ -44,6 +46,7 @@ export const StatsPanel = ({
   const lastLeader = mostRoundsAsLast(players);
   const highestRound = getHighestSingleRoundScore(rounds, players);
   const none = t("stats.none");
+  const isArrivalsOnly = mode === "arrivalsOnly";
 
   return (
     <Modal
@@ -120,18 +123,20 @@ export const StatsPanel = ({
           label={t("stats.totalTime")}
           value={formatDuration(totalTime(rounds))}
         />
-        <Badge
-          icon={Flame}
-          accent="#F59E0B"
-          label={t("stats.highestRound")}
-          value={
-            highestRound
-              ? `${highestRound.player.name} · ${highestRound.score} (${t(
-                  "common.round",
-                )} ${highestRound.round})`
-              : none
-          }
-        />
+        {!isArrivalsOnly && (
+          <Badge
+            icon={Flame}
+            accent="#F59E0B"
+            label={t("stats.highestRound")}
+            value={
+              highestRound
+                ? `${highestRound.player.name} · ${highestRound.score} (${t(
+                    "common.round",
+                  )} ${highestRound.round})`
+                : none
+            }
+          />
+        )}
       </div>
     </Modal>
   );

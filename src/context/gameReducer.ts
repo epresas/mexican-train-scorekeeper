@@ -1,6 +1,7 @@
 import type { GameAction, GameState, Player, Round, GameRules } from "../types/game.types"
 
 const defaultGameRules: GameRules = {
+  mode: "standard",
   arrivalBonus: false,
   penaltiesEnabled: false,
   penaltyMultiplier: 3,
@@ -20,9 +21,11 @@ export const initialGameState: GameState = {
   currentRoundPenalties: {},
 }
 
-/** Rank playerIds best→worst by the given round scores (lower = better). */
-const rankRound = (scores: Record<string, number>): string[] =>
-  Object.keys(scores).sort((a, b) => scores[a] - scores[b])
+/** Rank playerIds best→worst by the given round scores. Lower is better in standard mode, higher is better in arrivalsOnly mode. */
+const rankRound = (scores: Record<string, number>, isArrivalsOnly = false): string[] =>
+  Object.keys(scores).sort((a, b) =>
+    isArrivalsOnly ? scores[b] - scores[a] : scores[a] - scores[b],
+  )
 
 export const gameReducer = (
   state: GameState,
@@ -92,31 +95,42 @@ export const gameReducer = (
 
     case "SUBMIT_ROUND": {
       const { scores, arrivals, duration } = action.payload
+      const isArrivalsOnly = state.gameRules.mode === "arrivalsOnly"
 
       const finalScores: Record<string, number> = {}
       for (const p of state.players) {
-        const enteredScore = scores[p.id] ?? 0
-        const pCount = state.currentRoundPenalties[p.id] ?? 0
-        const penaltyMult = state.gameRules.penaltiesEnabled ? state.gameRules.penaltyMultiplier : 0
-        const scoreWithPenalties = enteredScore + (pCount * penaltyMult)
-        // arrived player's round score is always 0
-        finalScores[p.id] = arrivals[p.id] ? 0 : scoreWithPenalties
+        if (isArrivalsOnly) {
+          finalScores[p.id] = arrivals[p.id] ? 1 : 0
+        } else {
+          const enteredScore = scores[p.id] ?? 0
+          const pCount = state.currentRoundPenalties[p.id] ?? 0
+          const penaltyMult = state.gameRules.penaltiesEnabled ? state.gameRules.penaltyMultiplier : 0
+          const penaltyPoints = pCount * penaltyMult
+
+          if (arrivals[p.id]) {
+            const baseArrivalScore = state.gameRules.arrivalBonus ? -10 : 0
+            finalScores[p.id] = baseArrivalScore + penaltyPoints
+          } else {
+            finalScores[p.id] = enteredScore + penaltyPoints
+          }
+        }
       }
 
-      const rankings = rankRound(finalScores)
+      const rankings = rankRound(finalScores, isArrivalsOnly)
 
       // highest score in the round = "last" this round (ties share the flag)
       const maxScore = Math.max(...Object.values(finalScores))
 
       const players = state.players.map((p) => {
         const addedArrival = arrivals[p.id] ? 1 : 0
-        const addedArrivalBonus = (state.gameRules.arrivalBonus && arrivals[p.id]) ? 10 : 0
+        const newArrivals = p.arrivals + addedArrival
+        const arrivalBonusTotal = state.gameRules.arrivalBonus ? newArrivals * 10 : 0
         const addedPenalty = state.gameRules.penaltiesEnabled ? (state.currentRoundPenalties[p.id] ?? 0) : 0
 
         return {
           ...p,
-          arrivals: p.arrivals + addedArrival,
-          arrivalBonusTotal: p.arrivalBonusTotal + addedArrivalBonus,
+          arrivals: newArrivals,
+          arrivalBonusTotal,
           penaltyCount: p.penaltyCount + addedPenalty,
           roundsAsLast:
             p.roundsAsLast + (finalScores[p.id] === maxScore && maxScore > 0 ? 1 : 0),

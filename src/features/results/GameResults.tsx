@@ -77,15 +77,10 @@ export const GameResults = () => {
                   className="font-mono text-2xl font-black"
                   style={{ color: r.color }}
                 >
-                  {Math.max(0, r.total)}
-                  {vm.gameRules.arrivalBonus && r.total < 0 && (
-                    <span className="text-sm font-normal text-muted ml-1">
-                      (-{r.player.arrivalBonusTotal})
-                    </span>
-                  )}
+                  {r.total}
                 </p>
                 <p className="text-xs uppercase tracking-wide text-muted">
-                  {vm.t("results.points")}
+                  {vm.gameRules.mode === "arrivalsOnly" ? vm.t("results.arrivals") : vm.t("results.points")}
                 </p>
               </div>
             </motion.li>
@@ -115,6 +110,7 @@ export const GameResults = () => {
         players={vm.players}
         rounds={vm.rounds}
         colorById={vm.colorById}
+        mode={vm.gameRules.mode}
       />
     </main>
   )

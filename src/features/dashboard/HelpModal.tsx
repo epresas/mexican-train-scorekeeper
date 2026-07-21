@@ -25,6 +25,7 @@ const STEPS: Step[] = [
   { emoji: "🏆", title: "help.step5.title", body: "help.step5.body" },
   { emoji: "⭐", title: "help.step6.title", body: "help.step6.body" },
   { emoji: "⚠️", title: "help.step7.title", body: "help.step7.body" },
+  { emoji: "⚡", title: "help.step8.title", body: "help.step8.body" },
 ]
 
 const variants = {

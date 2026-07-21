@@ -1,19 +1,16 @@
-import type { Player, Round } from "../types/game.types"
+import type { GameMode, Player, Round } from "../types/game.types"
 
 /** Total points for a single player across all rounds. */
 export const playerTotal = (playerId: string, rounds: Round[]): number =>
   rounds.reduce((sum, r) => sum + (r.scores[playerId] ?? 0), 0)
 
-/** Map of playerId → total points (effective, subtracting arrival bonus). */
+/** Map of playerId → total points. */
 export const allTotals = (
   players: Player[],
   rounds: Round[],
 ): Record<string, number> =>
   Object.fromEntries(
-    players.map((p) => [
-      p.id,
-      playerTotal(p.id, rounds) - (p.arrivalBonusTotal ?? 0),
-    ]),
+    players.map((p) => [p.id, playerTotal(p.id, rounds)]),
   )
 
 export interface RankedPlayer {
@@ -22,13 +19,21 @@ export interface RankedPlayer {
   rank: number
 }
 
-/** Players ranked best→worst (lower total = better). Ties share a rank. */
+/** Players ranked best→worst. In standard mode lower total is better; in arrivalsOnly mode higher total is better. Ties share a rank. */
 export const rankPlayers = (
   players: Player[],
   rounds: Round[],
+  mode: GameMode = "standard",
 ): RankedPlayer[] => {
   const totals = allTotals(players, rounds)
-  const sorted = [...players].sort((a, b) => totals[a.id] - totals[b.id])
+  const isArrivalsOnly = mode === "arrivalsOnly"
+  const sorted = [...players].sort((a, b) => {
+    if (totals[a.id] !== totals[b.id]) {
+      return isArrivalsOnly ? totals[b.id] - totals[a.id] : totals[a.id] - totals[b.id]
+    }
+    // Tie-breaker: player with more arrivals wins
+    return b.arrivals - a.arrivals
+  })
 
   let lastTotal: number | null = null
   let lastRank = 0
@@ -54,9 +59,10 @@ export interface Standing {
 export const standings = (
   players: Player[],
   rounds: Round[],
+  mode: GameMode = "standard",
 ): Record<string, Standing> => {
-  const currentRanks = rankPlayers(players, rounds)
-  const prevRanks = rankPlayers(players, rounds.slice(0, -1))
+  const currentRanks = rankPlayers(players, rounds, mode)
+  const prevRanks = rankPlayers(players, rounds.slice(0, -1), mode)
   const prevRankById = Object.fromEntries(
     prevRanks.map((r) => [r.player.id, r.rank]),
   )
@@ -68,11 +74,12 @@ export const standings = (
   )
 }
 
-/** The winning player (lowest total). Undefined if no players. */
+/** The winning player (best score according to mode). Undefined if no players. */
 export const winner = (
   players: Player[],
   rounds: Round[],
-): Player | undefined => rankPlayers(players, rounds)[0]?.player
+  mode: GameMode = "standard",
+): Player | undefined => rankPlayers(players, rounds, mode)[0]?.player
 
 /** Cumulative totals per round for charting. */
 export const cumulativeSeries = (

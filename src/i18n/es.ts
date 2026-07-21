@@ -50,6 +50,9 @@ export const es = {
   "help.step7.title": "Penalizaciones",
   "help.step7.body":
     "Si activas las penalizaciones, aparece el icono ⚠️ junto a cada jugador. Tócalo para añadir penalizaciones durante la ronda. Al confirmar los puntos, cada penalización se multiplica por ×3 o ×5 según la configuración y se suma al marcador del jugador.",
+  "help.step8.title": "Modo llegada",
+  "help.step8.body":
+    "Si activas 'Modo llegada' en la configuración, en lugar de anotar los puntos de las fichas restantes de cada jugador, solo seleccionas quién se quedó sin fichas en la ronda. Al finalizar todas las rondas, el ganador será la persona que más llegadas acumule.",
   "help.progress": "Paso {current} de {total}",
 
   // Setup
@@ -59,6 +62,7 @@ export const es = {
   "setup.playerNames": "Nombres de los jugadores",
   "setup.playerPlaceholder": "Jugador {n}",
   "setup.additionalRules": "Reglas adicionales",
+  "setup.arrivalsOnlyMode": "Modo llegada",
   "setup.arrivalBonus": "Restar 10 puntos al llegar",
   "setup.enablePenalties": "Activar penalizaciones",
   "setup.penaltyMultiplier": "Multiplicador",

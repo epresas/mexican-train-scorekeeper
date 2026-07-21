@@ -23,9 +23,11 @@ export const useGameBoard = () => {
   const [activePopoverPlayerId, setActivePopoverPlayerId] = useState<string | null>(null);
   const [penaltyAmount, setPenaltyAmount] = useState<number>(1);
 
+  const isArrivalsOnly = state.gameRules.mode === "arrivalsOnly";
+
   const rankInfo = useMemo(
-    () => standings(state.players, state.rounds),
-    [state.players, state.rounds],
+    () => standings(state.players, state.rounds, state.gameRules.mode),
+    [state.players, state.rounds, state.gameRules.mode],
   );
 
   const hasRounds = state.rounds.length > 0;
@@ -34,15 +36,7 @@ export const useGameBoard = () => {
     () =>
       state.players.map((p, i) => {
         const rawTotal = playerTotal(p.id, state.rounds);
-        const arrivalBonusTotal = p.arrivalBonusTotal ?? 0;
-        const effective = rawTotal - arrivalBonusTotal;
-        const isNegative = state.gameRules.arrivalBonus && effective < 0;
-
-        // Clamp display to 0 — negative effective is a ranking advantage but
-        // should never render as a number below zero.
-        const totalDisplay = isNegative
-          ? `0 (-${arrivalBonusTotal})`
-          : String(effective);
+        const totalDisplay = isArrivalsOnly ? String(p.arrivals) : String(rawTotal);
 
         return {
           ...p,
@@ -54,7 +48,7 @@ export const useGameBoard = () => {
           pendingPenalties: state.currentRoundPenalties[p.id] ?? 0,
         };
       }),
-    [state.players, state.rounds, entries, state.gameRules, state.currentRoundPenalties, rankInfo],
+    [state.players, state.rounds, entries, state.gameRules, state.currentRoundPenalties, rankInfo, isArrivalsOnly],
   );
 
   const endRound = () => {
@@ -79,6 +73,19 @@ export const useGameBoard = () => {
     setEntries((prev) => {
       const current = prev[playerId] ?? emptyEntry();
       const arrived = !current.arrived;
+
+      if (isArrivalsOnly) {
+        // In arrivals-only mode, selecting a player clears arrived flag for others
+        const newEntries: Record<string, ScoreEntry> = {};
+        for (const p of state.players) {
+          newEntries[p.id] = {
+            arrived: p.id === playerId ? arrived : false,
+            value: p.id === playerId && arrived ? "1" : "0",
+          };
+        }
+        return newEntries;
+      }
+
       return {
         ...prev,
         [playerId]: {
@@ -94,14 +101,26 @@ export const useGameBoard = () => {
     const scores: Record<string, number> = {};
     const arrivals: Record<string, boolean> = {};
 
+    let hasArrival = false;
     for (const p of state.players) {
       const entry = entries[p.id] ?? emptyEntry();
-      if (entry.value === "" || Number.isNaN(Number(entry.value))) {
-        setError(t("game.errorScores"));
-        return;
+      if (entry.arrived) hasArrival = true;
+
+      if (!isArrivalsOnly) {
+        if (entry.value === "" || Number.isNaN(Number(entry.value))) {
+          setError(t("game.errorScores"));
+          return;
+        }
+        scores[p.id] = Number(entry.value);
+      } else {
+        scores[p.id] = entry.arrived ? 1 : 0;
       }
-      scores[p.id] = Number(entry.value);
       arrivals[p.id] = entry.arrived;
+    }
+
+    if (isArrivalsOnly && !hasArrival) {
+      setError(t("game.errorScores"));
+      return;
     }
 
     // Duration is measured silently from the round start — no live timer UI.

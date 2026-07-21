@@ -26,6 +26,7 @@ export const useGameSetup = () => {
   const [error, setError] = useState<string | null>(null)
 
   // Additional rules state
+  const [isArrivalsOnly, setIsArrivalsOnly] = useState(false)
   const [arrivalBonus, setArrivalBonus] = useState(false)
   const [penaltiesEnabled, setPenaltiesEnabled] = useState(false)
   const [penaltyMultiplier, setPenaltyMultiplier] = useState<3 | 5>(3)
@@ -82,8 +83,9 @@ export const useGameSetup = () => {
     dispatch({
       type: "SET_GAME_RULES",
       payload: {
-        arrivalBonus,
-        penaltiesEnabled,
+        mode: isArrivalsOnly ? "arrivalsOnly" : "standard",
+        arrivalBonus: isArrivalsOnly ? false : arrivalBonus,
+        penaltiesEnabled: isArrivalsOnly ? false : penaltiesEnabled,
         penaltyMultiplier,
       },
     })
@@ -108,6 +110,8 @@ export const useGameSetup = () => {
     maxRounds: MAX_ROUNDS,
     arrivalBonus,
     toggleArrivalBonus: () => setArrivalBonus((v) => !v),
+    isArrivalsOnly,
+    toggleArrivalsOnly: () => setIsArrivalsOnly((v) => !v),
     penaltiesEnabled,
     togglePenaltiesEnabled: () => setPenaltiesEnabled((v) => !v),
     penaltyMultiplier,

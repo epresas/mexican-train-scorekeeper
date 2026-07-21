@@ -1,6 +1,9 @@
 export type GamePhase = "dashboard" | "setup" | "playing" | "results"
 
+export type GameMode = "standard" | "arrivalsOnly"
+
 export interface GameRules {
+  mode: GameMode
   arrivalBonus: boolean
   penaltiesEnabled: boolean
   penaltyMultiplier: 3 | 5

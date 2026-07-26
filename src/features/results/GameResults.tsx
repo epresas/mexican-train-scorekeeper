@@ -1,11 +1,14 @@
-import { BarChart3, RotateCcw, Trophy } from "lucide-react"
+import { BarChart3, Loader2, RotateCcw, Share2, Trophy } from "lucide-react"
 import { motion } from "motion/react"
 import { Button } from "../../components/Button"
 import { StatsPanel } from "./StatsPanel"
+import { ShareCard } from "./components/ShareCard"
 import { useGameResults } from "./useGameResults"
+import { useShareResults } from "./useShareResults"
 
 export const GameResults = () => {
   const vm = useGameResults()
+  const shareVm = useShareResults(vm.players, vm.rounds)
 
   return (
     <main className="relative mx-auto flex min-h-full w-full max-w-xl flex-col px-6 py-12">
@@ -88,6 +91,13 @@ export const GameResults = () => {
         })}
       </ol>
 
+      {/* Share error */}
+      {shareVm.error && (
+        <p role="alert" className="mt-4 text-sm text-red-400">
+          {shareVm.error}
+        </p>
+      )}
+
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Button
           variant="secondary"
@@ -98,11 +108,37 @@ export const GameResults = () => {
           <BarChart3 size={18} />
           {vm.t("results.viewStats")}
         </Button>
+
+        {shareVm.isShareSupported && (
+          <Button
+            variant="secondary"
+            size="lg"
+            onClick={shareVm.handleShare}
+            disabled={shareVm.isGenerating}
+            className="w-full"
+          >
+            {shareVm.isGenerating ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                {vm.t("results.shareGenerating")}
+              </>
+            ) : (
+              <>
+                <Share2 size={18} />
+                {vm.t("results.shareButton")}
+              </>
+            )}
+          </Button>
+        )}
+
         <Button size="lg" onClick={vm.newGame} className="w-full">
           <RotateCcw size={18} />
           {vm.t("results.newGame")}
         </Button>
       </div>
+
+      {/* Off-screen card always present in DOM for html-to-image capture */}
+      <ShareCard ranked={shareVm.ranked} badges={shareVm.badges} />
 
       <StatsPanel
         open={vm.statsOpen}

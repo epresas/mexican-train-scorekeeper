@@ -1,5 +1,6 @@
 export interface FeatureFlags {
   dominoScanner: boolean
+  shareResults: boolean
 }
 
 const getEnv = (): Record<string, string | undefined> => {
@@ -13,6 +14,8 @@ const getEnv = (): Record<string, string | undefined> => {
 export const featureFlags: FeatureFlags = {
   // Domino Scanner disabled by default in production unless explicitly enabled via env var
   dominoScanner: getEnv().VITE_FF_DOMINO_SCANNER === "true",
+  // Share Results enabled by default; set VITE_FF_SHARE_RESULTS=false to disable
+  shareResults: getEnv().VITE_FF_SHARE_RESULTS !== "false",
 }
 
 export const isFeatureEnabled = (flag: keyof FeatureFlags): boolean => {

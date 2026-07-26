@@ -91,6 +91,9 @@ export const en: Record<TranslationKey, string> = {
   "results.newGame": "New game",
   "results.arrivals": "arrivals",
   "results.points": "pts",
+  "results.shareButton": "Share result",
+  "results.shareGenerating": "Generating image...",
+  "results.shareError": "Could not generate the image. Please try again.",
 
   // Stats
   "stats.title": "Stats",

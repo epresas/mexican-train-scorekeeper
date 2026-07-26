@@ -89,6 +89,9 @@ export const es = {
   "results.newGame": "Nueva partida",
   "results.arrivals": "llegadas",
   "results.points": "pts",
+  "results.shareButton": "Compartir resultado",
+  "results.shareGenerating": "Generando imagen...",
+  "results.shareError": "No se pudo generar la imagen. Inténtalo de nuevo.",
 
   // Stats
   "stats.title": "Estadísticas",

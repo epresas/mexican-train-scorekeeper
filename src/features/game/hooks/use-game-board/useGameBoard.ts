@@ -86,13 +86,21 @@ export const useGameBoard = () => {
         return newEntries;
       }
 
-      return {
-        ...prev,
-        [playerId]: {
-          arrived,
-          value: arrived ? "0" : "",
-        },
-      };
+      const newEntries: Record<string, ScoreEntry> = { ...prev };
+
+      if (arrived) {
+        for (const p of state.players) {
+          if (p.id === playerId) {
+            newEntries[p.id] = { arrived: true, value: "0" };
+          } else if (newEntries[p.id]?.arrived) {
+            newEntries[p.id] = { arrived: false, value: "" };
+          }
+        }
+      } else {
+        newEntries[playerId] = { arrived: false, value: "" };
+      }
+
+      return newEntries;
     });
     setError(null);
   };

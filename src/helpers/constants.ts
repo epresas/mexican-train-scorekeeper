@@ -13,7 +13,7 @@ export const MIN_PLAYERS = 2
 export const MAX_PLAYERS = 8
 export const MIN_ROUNDS = 1
 export const MAX_ROUNDS = 20
-export const DEFAULT_ROUNDS = 13
+export const DEFAULT_ROUNDS = 6
 
 export const playerColor = (index: number) =>
   PLAYER_COLORS[index % PLAYER_COLORS.length]

@@ -1,6 +1,6 @@
-import { Modal } from "../../../../components/Modal";
-import { Button } from "../../../../components/Button";
-import { useTranslation } from "../../../../i18n/useTranslation";
+import { Modal } from "@/shared/components/Modal";
+import { Button } from "@/shared/components/Button";
+import { useTranslation } from "@/shared/i18n/useTranslation";
 
 interface ExitConfirmModalProps {
   open: boolean;

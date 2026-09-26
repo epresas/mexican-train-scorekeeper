@@ -1,5 +1,5 @@
 import { HelpCircle, Play, TrainFront } from "lucide-react"
-import { Button } from "../../components/Button"
+import { Button } from "@/shared/components/Button"
 import { DominoBackground } from "./DominoBackground"
 import { HelpModal } from "./HelpModal"
 import { useDashboard } from "./useDashboard"

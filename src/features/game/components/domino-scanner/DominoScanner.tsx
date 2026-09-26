@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from "react";
-import { useDominoScanner } from "../../hooks/use-domino-scanner/useDominoScanner";
+import { useDominoScanner } from "@/infrastructure/useDominoScanner";
 
 interface DominoScannerProps {
   onPointsDetected: (points: number) => void;

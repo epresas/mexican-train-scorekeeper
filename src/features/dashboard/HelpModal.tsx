@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Modal } from "../../components/Modal"
-import { Button } from "../../components/Button"
-import { useTranslation } from "../../i18n/useTranslation"
-import type { TranslationKey } from "../../i18n/es"
+import { Modal } from "@/shared/components/modal/Modal"
+import { Button } from "@/shared/components/button/Button";
+import { useTranslation } from "@/shared/i18n/useTranslation"
+import type { TranslationKey } from "@/shared/i18n/es";
 
 interface HelpModalProps {
   open: boolean

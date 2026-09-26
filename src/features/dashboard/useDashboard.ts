@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { useGameContext } from "../../context/GameContext"
-import { useTranslation } from "../../i18n/useTranslation"
+import { useGameContext } from "@/store/game-context/GameContext"
+import { useTranslation } from "@/shared/i18n/useTranslation"
 
 export const useDashboard = () => {
   const { dispatch } = useGameContext()

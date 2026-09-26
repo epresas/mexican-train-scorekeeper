@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react"
-import { useGameContext } from "../../context/GameContext"
-import { useTranslation } from "../../i18n/useTranslation"
-import { rankPlayers } from "../../helpers/scoreHelpers"
-import { playerColor } from "../../helpers/constants"
+import { useGameContext } from "@/store/game-context/GameContext"
+import { useTranslation } from "@/shared/i18n/useTranslation"
+import { rankPlayers } from "@/domain/score-engine"
+import { playerColor } from "@/shared/helpers/constants"
 
 const MEDALS = ["🥇", "🥈", "🥉"]
 

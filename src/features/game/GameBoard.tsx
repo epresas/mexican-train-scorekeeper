@@ -9,14 +9,17 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useRef, useState } from "react";
-import { Button } from "../../components/Button";
-import { ExitConfirmModal } from "./components/exit-confirm-modal/ExitConfirmModal";
-import { DominoScanner } from "./components/domino-scanner/DominoScanner";
-import { useGameBoard } from "./hooks/use-game-board/useGameBoard";
-import { useCameraCheck } from "../../hooks/useCameraCheck/useCameraCheck";
-import { PenaltyPopover } from "./components/PenaltyPopover";
-import { isFeatureEnabled } from "../../config/featureFlags";
+import { useRef, useState, useEffect, useMemo } from "react";
+import { Button } from "@/shared/components/button/Button";
+import { ExitConfirmModal } from "@/features/game/components/exit-confirm-modal/ExitConfirmModal";
+import { DominoScanner } from "@/features/game/components/domino-scanner/DominoScanner";
+import { useGameBoard } from "@/features/game/useGameBoard";
+import { useCameraCheck } from "@/shared/hooks/use-camera-check/useCameraCheck";
+import { PenaltyPopover } from "@/features/game/components/penalty-popover/PenaltyPopover";
+import { isFeatureEnabled } from "@/shared/config/featureFlags";
+import { EditableScoreCell } from "@/features/game/components/editable-score-cell/EditableScoreCell";
+import { RankMovement } from "@/features/game/components/rank-movement/RankMovement";
+
 
 const cellContainer = {
   hidden: {},
@@ -30,25 +33,7 @@ const cellChild = {
 const MEDALS: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 
 /** Up/down/neutral movement vs. the previous round's standings. */
-const RankMovement = ({ delta }: { delta: number }) => {
-  if (delta > 0) {
-    return (
-      <span className="inline-flex items-center gap-0.5 font-mono text-xs font-bold text-success">
-        <ArrowUp size={12} aria-hidden="true" />
-        {delta}
-      </span>
-    );
-  }
-  if (delta < 0) {
-    return (
-      <span className="inline-flex items-center gap-0.5 font-mono text-xs font-bold text-danger">
-        <ArrowDown size={12} aria-hidden="true" />
-        {Math.abs(delta)}
-      </span>
-    );
-  }
-  return <Minus size={12} className="text-muted" aria-hidden="true" />;
-};
+
 
 export const GameBoard = () => {
   const vm = useGameBoard();
@@ -56,15 +41,6 @@ export const GameBoard = () => {
   const [scannerError, setScannerError] = useState<string | null>(null);
   const showScanner = isFeatureEnabled("dominoScanner");
   const isArrivalsOnly = vm.gameRules.mode === "arrivalsOnly";
-
-  // One ref per player for the penalty trigger button — stable map keyed by id
-  const penaltyBtnRefs = useRef<Record<string, React.RefObject<HTMLButtonElement | null>>>({});
-  const getPenaltyRef = (id: string) => {
-    if (!penaltyBtnRefs.current[id]) {
-      penaltyBtnRefs.current[id] = { current: null };
-    }
-    return penaltyBtnRefs.current[id];
-  };
 
   return (
     <main className="relative mx-auto flex min-h-full w-full max-w-3xl flex-col px-4 py-6 sm:px-6">
@@ -79,11 +55,6 @@ export const GameBoard = () => {
             <span className="text-muted">/{vm.totalRounds}</span>
           </p>
         </div>
-
-        <Button variant="ghost" size="sm" onClick={vm.requestExit}>
-          <LogOut size={16} />
-          <span className="sr-only sm:not-sr-only">{vm.t("game.exit")}</span>
-        </Button>
       </header>
 
       {/* Score table */}
@@ -108,7 +79,7 @@ export const GameBoard = () => {
                     {vm.gameRules.penaltiesEnabled && (
                       <div className="relative">
                         <button
-                          ref={getPenaltyRef(p.id) as React.RefObject<HTMLButtonElement>}
+                          ref={vm.penaltyBtnRefs[p.id] as React.RefObject<HTMLButtonElement>}
                           type="button"
                           onClick={() => {
                             if (vm.activePopoverPlayerId === p.id) {
@@ -140,7 +111,7 @@ export const GameBoard = () => {
                           <PenaltyPopover
                             playerName={p.name}
                             playerId={p.id}
-                            triggerRef={getPenaltyRef(p.id)}
+                            triggerRef={vm.penaltyBtnRefs[p.id]}
                             value={vm.penaltyAmount}
                             onChange={vm.setPenaltyAmount}
                             onConfirm={() => vm.confirmPenalty(p.id)}
@@ -168,9 +139,22 @@ export const GameBoard = () => {
                 {vm.players.map((p) => (
                   <td
                     key={p.id}
-                    className="px-3 py-2 text-center font-mono font-black text-text-primary"
+                    className="px-3 py-2 text-center"
                   >
-                    {r.scores[p.id] ?? 0}
+                    {isArrivalsOnly ? (
+                      <span className="font-mono font-black text-text-primary">
+                        {r.scores[p.id] ?? 0}
+                      </span>
+                    ) : (
+                      <div className="flex justify-center items-center gap-1">
+                        {r.arrivals?.[p.id] && <CheckCircle2 size={12} className="text-success" />}
+                        <EditableScoreCell
+                          score={r.scores[p.id] ?? 0}
+                          disabled={r.arrivals?.[p.id]}
+                          onSave={(val) => vm.editRoundScore(r.index, p.id, val)}
+                        />
+                      </div>
+                    )}
                   </td>
                 ))}
               </motion.tr>
@@ -306,18 +290,27 @@ export const GameBoard = () => {
       )}
 
       {/* Footer actions */}
-      <div className="mt-6 flex justify-center">
+      <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
         {vm.isInputPhase ? (
-          <Button size="lg" onClick={vm.submitRound}>
+          <Button size="lg" onClick={vm.submitRound} className="w-full sm:w-auto">
             <Check size={18} />
             {vm.t("game.confirmScores")}
           </Button>
         ) : (
-          <Button size="lg" variant="primary" onClick={vm.endRound}>
+          <Button size="lg" variant="primary" onClick={vm.endRound} className="w-full sm:w-auto">
             <Flag size={18} />
             {vm.t("game.endRound")}
           </Button>
         )}
+        <Button 
+          size="lg" 
+          variant="ghost" 
+          onClick={vm.requestExit} 
+          className="w-full sm:w-auto text-danger hover:bg-danger/10 hover:text-danger border border-transparent hover:border-danger/20"
+        >
+          <LogOut size={18} />
+          {vm.t("game.exit")}
+        </Button>
       </div>
 
       <ExitConfirmModal

@@ -1,46 +1,9 @@
-import { Minus, Plus, Play, ArrowLeft } from "lucide-react"
+import { Play, ArrowLeft } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
-import { Button } from "../../components/Button"
+import { Button } from "@/shared/components/button/Button"
 import { useGameSetup } from "./useGameSetup"
+import { Stepper } from "./components/stepper/Stepper"
 
-const Stepper = ({
-  label,
-  value,
-  min,
-  max,
-  onChange,
-}: {
-  label: string
-  value: number
-  min: number
-  max: number
-  onChange: (v: number) => void
-}) => (
-  <div>
-    <p className="mb-2 text-xs uppercase tracking-wide text-muted">{label}</p>
-    <div className="flex items-center gap-3">
-      <button
-        onClick={() => onChange(value - 1)}
-        disabled={value <= min}
-        aria-label="decrease"
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface text-text-primary transition-colors hover:bg-border/50 disabled:opacity-40"
-      >
-        <Minus size={18} />
-      </button>
-      <span className="min-w-[3ch] text-center font-mono text-3xl font-black text-text-primary">
-        {value}
-      </span>
-      <button
-        onClick={() => onChange(value + 1)}
-        disabled={value >= max}
-        aria-label="increase"
-        className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface text-text-primary transition-colors hover:bg-border/50 disabled:opacity-40"
-      >
-        <Plus size={18} />
-      </button>
-    </div>
-  </div>
-)
 
 export const GameSetup = () => {
   const vm = useGameSetup()
@@ -121,14 +84,12 @@ export const GameSetup = () => {
                 id="arrivals-only-toggle"
                 type="button"
                 onClick={vm.toggleArrivalsOnly}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                  vm.isArrivalsOnly ? "bg-primary" : "bg-border"
-                }`}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${vm.isArrivalsOnly ? "bg-primary" : "bg-border"
+                  }`}
               >
                 <span
-                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${
-                    vm.isArrivalsOnly ? "translate-x-5" : "translate-x-0"
-                  }`}
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${vm.isArrivalsOnly ? "translate-x-5" : "translate-x-0"
+                    }`}
                 />
               </button>
             </div>
@@ -152,14 +113,12 @@ export const GameSetup = () => {
                       id="arrival-bonus-toggle"
                       type="button"
                       onClick={vm.toggleArrivalBonus}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        vm.arrivalBonus ? "bg-primary" : "bg-border"
-                      }`}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${vm.arrivalBonus ? "bg-primary" : "bg-border"
+                        }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${
-                          vm.arrivalBonus ? "translate-x-5" : "translate-x-0"
-                        }`}
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${vm.arrivalBonus ? "translate-x-5" : "translate-x-0"
+                          }`}
                       />
                     </button>
                   </div>
@@ -173,14 +132,12 @@ export const GameSetup = () => {
                       id="penalties-toggle"
                       type="button"
                       onClick={vm.togglePenaltiesEnabled}
-                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        vm.penaltiesEnabled ? "bg-primary" : "bg-border"
-                      }`}
+                      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${vm.penaltiesEnabled ? "bg-primary" : "bg-border"
+                        }`}
                     >
                       <span
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${
-                          vm.penaltiesEnabled ? "translate-x-5" : "translate-x-0"
-                        }`}
+                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-surface shadow ring-0 transition duration-200 ease-in-out ${vm.penaltiesEnabled ? "translate-x-5" : "translate-x-0"
+                          }`}
                       />
                     </button>
                   </div>
@@ -195,22 +152,20 @@ export const GameSetup = () => {
                         <button
                           type="button"
                           onClick={() => vm.setPenaltyMultiplier(3)}
-                          className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${
-                            vm.penaltyMultiplier === 3
-                              ? "bg-primary text-bg"
-                              : "text-muted hover:text-text-primary"
-                          }`}
+                          className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${vm.penaltyMultiplier === 3
+                            ? "bg-primary text-bg"
+                            : "text-muted hover:text-text-primary"
+                            }`}
                         >
                           ×3
                         </button>
                         <button
                           type="button"
                           onClick={() => vm.setPenaltyMultiplier(5)}
-                          className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${
-                            vm.penaltyMultiplier === 5
-                              ? "bg-primary text-bg"
-                              : "text-muted hover:text-text-primary"
-                          }`}
+                          className={`rounded-md px-3 py-1 text-xs font-black transition-colors ${vm.penaltyMultiplier === 5
+                            ? "bg-primary text-bg"
+                            : "text-muted hover:text-text-primary"
+                            }`}
                         >
                           ×5
                         </button>

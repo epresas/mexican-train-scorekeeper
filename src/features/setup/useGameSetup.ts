@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
-import { useGameContext } from "../../context/GameContext"
-import { useTranslation } from "../../i18n/useTranslation"
+import { useGameContext } from "@/store/game-context/GameContext"
+import { useTranslation } from "@/shared/i18n/useTranslation"
 import {
   DEFAULT_ROUNDS,
   MAX_PLAYERS,
@@ -8,8 +8,8 @@ import {
   MIN_PLAYERS,
   MIN_ROUNDS,
   playerColor,
-} from "../../helpers/constants"
-import type { SetupPlayerInput } from "../../types/game.types"
+} from "@/shared/helpers/constants"
+import type { SetupPlayerInput } from "@/domain/types/game.types"
 
 const makeId = () =>
   `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 7)}`
@@ -81,18 +81,17 @@ export const useGameSetup = () => {
     }))
     
     dispatch({
-      type: "SET_GAME_RULES",
-      payload: {
-        mode: isArrivalsOnly ? "arrivalsOnly" : "standard",
-        arrivalBonus: isArrivalsOnly ? false : arrivalBonus,
-        penaltiesEnabled: isArrivalsOnly ? false : penaltiesEnabled,
-        penaltyMultiplier,
-      },
-    })
-
-    dispatch({
       type: "START_GAME",
-      payload: { players: payload, totalRounds },
+      payload: {
+        players: payload,
+        totalRounds,
+        gameRules: {
+          mode: isArrivalsOnly ? "arrivalsOnly" : "standard",
+          arrivalBonus: isArrivalsOnly ? false : arrivalBonus,
+          penaltiesEnabled: isArrivalsOnly ? false : penaltiesEnabled,
+          penaltyMultiplier,
+        },
+      },
     })
   }
 

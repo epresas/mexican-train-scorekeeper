@@ -8,18 +8,18 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Modal } from "../../components/Modal";
-import { Badge } from "../../components/Badge";
-import { useTranslation } from "../../i18n/useTranslation";
-import { cumulativeSeries } from "../../helpers/scoreHelpers";
+import { Modal } from "@/shared/components/modal/Modal";
+import { Badge } from "@/shared/components/badge/Badge";
+import { useTranslation } from "@/shared/i18n/useTranslation";
+import { cumulativeSeries } from "@/domain/score-engine";
 import {
   getHighestSingleRoundScore,
   mostArrivals,
   mostRoundsAsLast,
   totalTime,
-} from "../../helpers/statsHelpers";
-import { formatDuration } from "../../hooks/useTimer/useTimer";
-import type { GameMode, Player, Round } from "../../types/game.types";
+} from "@/domain/stats-engine";
+import { formatDuration } from "@/shared/helpers/time-helpers";
+import type { GameMode, Player, Round } from "@/domain/types/game.types";
 
 interface StatsPanelProps {
   open: boolean;

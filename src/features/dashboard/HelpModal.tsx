@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { Modal } from "@/shared/components/Modal"
-import { Button } from "@/shared/components/Button";
+import { Modal } from "@/shared/components/modal/Modal"
+import { Button } from "@/shared/components/button/Button";
 import { useTranslation } from "@/shared/i18n/useTranslation"
 import type { TranslationKey } from "@/shared/i18n/es";
 

@@ -10,15 +10,15 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useRef, useState, useEffect, useMemo } from "react";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/button/Button";
 import { ExitConfirmModal } from "@/features/game/components/exit-confirm-modal/ExitConfirmModal";
 import { DominoScanner } from "@/features/game/components/domino-scanner/DominoScanner";
 import { useGameBoard } from "@/features/game/useGameBoard";
 import { useCameraCheck } from "@/shared/hooks/use-camera-check/useCameraCheck";
-import { PenaltyPopover } from "@/features/game/components/PenaltyPopover";
+import { PenaltyPopover } from "@/features/game/components/penalty-popover/PenaltyPopover";
 import { isFeatureEnabled } from "@/shared/config/featureFlags";
-import { EditableScoreCell } from "@/features/game/components/EditableScoreCell";
-import { RankMovement } from "@/features/game/components/RankMovement";
+import { EditableScoreCell } from "@/features/game/components/editable-score-cell/EditableScoreCell";
+import { RankMovement } from "@/features/game/components/rank-movement/RankMovement";
 
 
 const cellContainer = {

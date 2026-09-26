@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useGameContext } from "@/store/GameContext"
+import { useGameContext } from "@/store/game-context/GameContext"
 import { useTranslation } from "@/shared/i18n/useTranslation"
 
 export const useDashboard = () => {

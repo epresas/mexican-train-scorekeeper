@@ -1,13 +1,13 @@
 import { X } from "lucide-react"
 import { AnimatePresence, motion } from "motion/react"
-import { useGameContext } from "@/store/GameContext"
+import { useGameContext } from "@/store/game-context/GameContext"
 import { useTranslation } from "@/shared/i18n/useTranslation"
-import { LanguageToggle } from "@/shared/components/LanguageToggle"
+import { LanguageToggle } from "@/shared/components/language-toggle/LanguageToggle"
 import { Dashboard } from "@/features/dashboard/Dashboard"
 import { GameSetup } from "@/features/setup/GameSetup"
 import { GameBoard } from "@/features/game/GameBoard"
 import { GameResults } from "@/features/results/GameResults"
-import { useGamePersistence } from "@/store/useGamePersistence"
+import { useGamePersistence } from "@/store/use-game-persistence/useGamePersistence"
 
 const screenTransition = {
   initial: { opacity: 0, x: 40 },

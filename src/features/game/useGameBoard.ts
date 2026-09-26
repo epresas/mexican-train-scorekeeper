@@ -1,5 +1,5 @@
 import { useMemo, useState, RefObject } from "react";
-import { useGameContext } from "@/store/GameContext";
+import { useGameContext } from "@/store/game-context/GameContext";
 import { useTranslation } from "@/shared/i18n/useTranslation";
 import { playerTotal, standings } from "@/domain/score-engine";
 import { playerColor } from "@/shared/helpers/constants";

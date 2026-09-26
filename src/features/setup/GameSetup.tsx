@@ -1,8 +1,8 @@
 import { Play, ArrowLeft } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react"
-import { Button } from "@/shared/components/Button"
+import { Button } from "@/shared/components/button/Button"
 import { useGameSetup } from "./useGameSetup"
-import { Stepper } from "./components/Stepper"
+import { Stepper } from "./components/stepper/Stepper"
 
 
 export const GameSetup = () => {

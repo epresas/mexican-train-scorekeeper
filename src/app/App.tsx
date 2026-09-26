@@ -1,6 +1,6 @@
-import { GameProvider } from "@/store/GameContext"
+import { GameProvider } from "@/store/game-context/GameContext"
 import { I18nProvider } from "@/shared/i18n/useTranslation"
-import { PhaseRouter } from "./components/PhaseRouter"
+import { PhaseRouter } from "./components/phase-router/PhaseRouter"
 
 export const App = () => (
   <I18nProvider>

@@ -8,8 +8,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Modal } from "@/shared/components/Modal";
-import { Badge } from "@/shared/components/Badge";
+import { Modal } from "@/shared/components/modal/Modal";
+import { Badge } from "@/shared/components/badge/Badge";
 import { useTranslation } from "@/shared/i18n/useTranslation";
 import { cumulativeSeries } from "@/domain/score-engine";
 import {

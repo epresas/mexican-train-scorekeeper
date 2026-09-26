@@ -1,4 +1,4 @@
-import { DominoTile } from "./components/DominoTile"
+import { DominoTile } from "./components/domino-tile/DominoTile"
 
 
 const TILES = [

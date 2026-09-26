@@ -1,6 +1,6 @@
 import { BarChart3, RotateCcw, Trophy } from "lucide-react"
 import { motion } from "motion/react"
-import { Button } from "@/shared/components/Button"
+import { Button } from "@/shared/components/button/Button"
 import { StatsPanel } from "./StatsPanel"
 import { useGameResults } from "./useGameResults"
 

@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react"
 import { describe, it, expect } from "vitest"
-import { useGameBoard } from "./useGameBoard"
-import { GameProvider, useGameContext } from "@/store/GameContext"
+import { useGameBoard } from "../useGameBoard"
+import { GameProvider, useGameContext } from "@/store/game-context/GameContext"
 import { ReactNode, useEffect } from "react"
 
 import { I18nProvider } from "@/shared/i18n/useTranslation"

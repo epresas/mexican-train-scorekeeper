@@ -1,5 +1,5 @@
-import { Modal } from "@/shared/components/Modal";
-import { Button } from "@/shared/components/Button";
+import { Modal } from "@/shared/components/modal/Modal";
+import { Button } from "@/shared/components/button/Button";
 import { useTranslation } from "@/shared/i18n/useTranslation";
 
 interface ExitConfirmModalProps {
